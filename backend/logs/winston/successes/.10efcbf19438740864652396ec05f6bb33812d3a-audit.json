@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\.10efcbf19438740864652396ec05f6bb33812d3a-audit.json",
+    "files": [
+        {
+            "date": 1742910175787,
+            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-25-03-19-success.log",
+            "hash": "e8b4afe63d8fadd8f88b0b5f35245508e9516c4d74404e89e9462e5ed2560642"
+        }
+    ],
+    "hashType": "sha256"
+}
