@@ -15,10 +15,10 @@ import { ENUM_USER_ROLE } from "../../../enum/user";
 import { sendEmail } from "./sendEmail";
 
 const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
-  const { id, password } = payload;
+  const { email, password } = payload;
 
   // If user does not exist or password is incorrect
-  const isUserExist = await User.isUserExist(id);
+  const isUserExist = await User.isUserExist(email);
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, "user does not exist");
   }
@@ -32,17 +32,17 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
 
   // If user exists and password is correct, return the user object with the token and refresh token
 
-  const { id: userId, role, needsPasswordChange } = isUserExist;
+  const { email: userEmail, role, needsPasswordChange } = isUserExist;
   // TODO: generate token and refresh token here
   const accessToken = jwtHelpers.createToken(
-    { userId, role },
+    { userEmail, role },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );
 
   // refresh token
   const refreshToken = jwtHelpers.createToken(
-    { userId, role },
+    { userEmail, role },
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string
   );
@@ -75,7 +75,7 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
 
   const newAccessToken = jwtHelpers.createToken(
     {
-      id: isUserExist.id,
+      email: isUserExist.email,
       role: isUserExist.role,
     },
     config.jwt.secret as Secret,
@@ -97,7 +97,7 @@ const changePassword = async (
   // const isUserExist = await User.isUserExist({id: user?.userId});
 
   //alternative way
-  const isUserExist = await User.findOne({ id: user?.userId }).select(
+  const isUserExist = await User.findOne({ email: user?.userEmail }).select(
     "+password"
   );
 
@@ -119,12 +119,11 @@ const changePassword = async (
   isUserExist.save();
 };
 
-const forgotPassword = async (payload: { id: string }) => {
+const forgotPassword = async (payload: { email: string }) => {
   // Find user by id with email and name fields
   const user = await User.findOne(
-    { id: payload.id },
+    { email: payload.email },
     {
-      id: 1,
       role: 1,
       email: 1,
       firstName: 1,
@@ -142,7 +141,7 @@ const forgotPassword = async (payload: { id: string }) => {
 
   // Generate password reset token (expires in 50 minutes)
   const passResetToken = await jwtHelpers.resetToken(
-    { id: user.id },
+    { email: user.email },
     config.jwt.secret as string,
     "50m"
   );
@@ -170,12 +169,12 @@ const forgotPassword = async (payload: { id: string }) => {
 };
 
 const resetPassword = async (
-  payload: { id: string; newPassword: string },
+  payload: { email: string; newPassword: string },
   token: string
 ) => {
-  const { id, newPassword } = payload;
+  const { email, newPassword } = payload;
 
-  const user = await User.findOne({ id }, { id: 1 });
+  const user = await User.findOne({ email: email }, { email: 1 });
 
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User Not Found!");
@@ -190,7 +189,7 @@ const resetPassword = async (
     Number(config.bycrypt_salt_rounds)
   );
 
-  await User.updateOne({ id }, { password });
+  await User.updateOne({ email: email }, { password });
 };
 
 export const AuthService = {

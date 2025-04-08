@@ -5,11 +5,6 @@ import config from "../../../config";
 
 const UserSchema = new Schema<IUser, UserModel>(
   {
-    id: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     role: {
       type: String,
       required: true,
@@ -94,23 +89,12 @@ const UserSchema = new Schema<IUser, UserModel>(
 // };
 
 UserSchema.statics.isUserExist = async function (
-  identifier: string | Types.ObjectId,
-  byField: "id" | "_id" = "id"
-): Promise<Pick<
-  IUser,
-  "id" | "password" | "role" | "needsPasswordChange"
-> | null> {
-  const query =
-    byField === "_id"
-      ? { _id: new Types.ObjectId(identifier) }
-      : { id: identifier };
-
-  return await User.findOne(query, {
-    id: 1,
-    password: 1,
-    role: 1,
-    needsPasswordChange: 1,
-  }).lean();
+  email: string
+): Promise<IUser | null> {
+  return await User.findOne(
+    { email: email },
+    { email: 1, password: 1, role: 1, needsPasswordChange: 1 }
+  );
 };
 
 // Check if password matches

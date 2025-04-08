@@ -1,7 +1,7 @@
 import express from "express";
 import { UserController } from "./user.controller";
 import validateRequest from "../../middlewares/validateRequest";
-import { Uservalidation } from "./user.validation";
+import { UserValidation } from "./user.validation";
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router.get("/:id", UserController.FindSingleUser);
 
 router.post(
   "/create",
-  validateRequest(Uservalidation.createStudent),
+  validateRequest(UserValidation.createUserZodSchema),
   UserController.create
 );
 

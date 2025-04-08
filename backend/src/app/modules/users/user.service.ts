@@ -9,11 +9,11 @@ import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { UserSearchableFields } from "./user.constants";
 
 const create = async (userData: IUser): Promise<IUser | null> => {
-  const isExist = await User.isUserExist(userData.id);
+  const isExist = await User.isUserExist(userData.email);
   if (isExist) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User already exists");
   }
-
+  console.log("userData", userData);
   const user = await User.create(userData);
 
   // Return user without password
