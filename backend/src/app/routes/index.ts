@@ -9,6 +9,7 @@ import { TrimRoutes } from "../modules/trims/trim.route";
 import { CategoryRoutes } from "../modules/category/category.route";
 import { ProductRoutes } from "../modules/product/product.route";
 import { TireSizeRoutes } from "../modules/tire-size/tire-size.route";
+import { DrivingTypeRoutes } from "../modules/driving-type/driving-type.route";
 
 const router = express.Router();
 
@@ -56,6 +57,10 @@ const modulesRoutes = [
   {
     path: "/tire-size",
     module: TireSizeRoutes,
+  },
+  {
+    path: "/driving-type",
+    module: DrivingTypeRoutes,
   },
 ];
 
