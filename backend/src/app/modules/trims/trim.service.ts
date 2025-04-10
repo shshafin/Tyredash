@@ -1,17 +1,17 @@
 import { ITrim } from "./trim.interface";
-import { Model } from "./trim.model";
+import { Trim } from "./trim.model";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { SortOrder } from "mongoose";
 
 const createTrim = async (payload: ITrim): Promise<ITrim | null> => {
-  const result = await Model.create(payload);
+  const result = await Trim.create(payload);
   return result;
 };
 
 const getSingleTrim = async (id: string): Promise<ITrim | null> => {
-  const result = await Model.findById(id)
+  const result = await Trim.findById(id)
     .populate("make")
     .populate("model")
     .populate("year");
@@ -30,7 +30,7 @@ const getAllTrims = async (
     sortConditions[sortBy] = sortOrder;
   }
 
-  const result = await Model.find()
+  const result = await Trim.find()
     .populate("make")
     .populate("model")
     .populate("year")
@@ -38,7 +38,7 @@ const getAllTrims = async (
     .skip(skip)
     .limit(limit);
 
-  const total = await Model.countDocuments();
+  const total = await Trim.countDocuments();
 
   return {
     meta: {
@@ -54,7 +54,7 @@ const updateTrim = async (
   id: string,
   payload: Partial<ITrim>
 ): Promise<ITrim | null> => {
-  const result = await Model.findByIdAndUpdate(id, payload, {
+  const result = await Trim.findByIdAndUpdate(id, payload, {
     new: true,
   })
     .populate("make")
@@ -64,7 +64,7 @@ const updateTrim = async (
 };
 
 const deleteTrim = async (id: string): Promise<ITrim | null> => {
-  const result = await Model.findByIdAndDelete(id);
+  const result = await Trim.findByIdAndDelete(id);
   return result;
 };
 

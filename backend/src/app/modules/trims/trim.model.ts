@@ -42,4 +42,4 @@ TrimSchema.statics.isModelExist = async function (
   return await this.findOne({ id });
 };
 
-export const Model = model<ITrim, ITrimModel>("Trim", TrimSchema);
+export const Trim = model<ITrim, ITrimModel>("Trim", TrimSchema);
