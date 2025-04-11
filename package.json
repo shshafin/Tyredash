@@ -8,5 +8,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "csv-parser": "^3.2.0",
+    "fs": "^0.0.1-security",
+    "multer": "^1.4.5-lts.2"
+  },
+  "devDependencies": {
+    "@types/multer": "^1.4.12"
+  }
 }

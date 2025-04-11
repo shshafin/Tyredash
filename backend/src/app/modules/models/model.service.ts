@@ -1,17 +1,17 @@
 import { IModel } from "./model.interface";
-import { Model } from "./model.model";
+import { CarModel } from "./model.model";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { SortOrder } from "mongoose";
 
 const createModel = async (payload: IModel): Promise<IModel | null> => {
-  const result = await Model.create(payload);
+  const result = await CarModel.create(payload);
   return result;
 };
 
 const getSingleModel = async (id: string): Promise<IModel | null> => {
-  const result = await Model.findById(id).populate("make").populate("year");
+  const result = await CarModel.findById(id).populate("make").populate("year");
   return result;
 };
 
@@ -27,14 +27,14 @@ const getAllModels = async (
     sortConditions[sortBy] = sortOrder;
   }
 
-  const result = await Model.find()
+  const result = await CarModel.find()
     .populate("make")
     .populate("year")
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
 
-  const total = await Model.countDocuments();
+  const total = await CarModel.countDocuments();
 
   return {
     meta: {
@@ -50,7 +50,7 @@ const updateModel = async (
   id: string,
   payload: Partial<IModel>
 ): Promise<IModel | null> => {
-  const result = await Model.findByIdAndUpdate(id, payload, {
+  const result = await CarModel.findByIdAndUpdate(id, payload, {
     new: true,
   })
     .populate("make")
@@ -59,7 +59,7 @@ const updateModel = async (
 };
 
 const deleteModel = async (id: string): Promise<IModel | null> => {
-  const result = await Model.findByIdAndDelete(id);
+  const result = await CarModel.findByIdAndDelete(id);
   return result;
 };
 

@@ -69,10 +69,28 @@ const deleteTrim = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const uploadCSV = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const file = req.file;
+    if (!file) {
+      res.status(400).json({ message: "No file uploaded" });
+      return;
+    }
+
+    const result = await TrimService.processCSVUpload(file.path);
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error processing the CSV file" });
+  }
+};
+
 export const TrimController = {
   createTrim,
   getSingleTrim,
   getAllTrims,
   updateTrim,
   deleteTrim,
+  uploadCSV,
 };

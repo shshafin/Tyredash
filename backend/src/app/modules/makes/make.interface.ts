@@ -2,7 +2,7 @@ import { Model, Types } from "mongoose";
 
 export interface IMake {
   make: string;
-  year: number | Types.ObjectId;
+  // year: number | Types.ObjectId;
   // models: Types.ObjectId[];
   logo?: string;
 }

@@ -9,11 +9,11 @@ const MakeSchema = new Schema<IMake, IMakeModel>(
       required: true,
       trim: true,
     },
-    year: {
-      type: Schema.Types.ObjectId,
-      ref: "Year",
-      required: true,
-    },
+    // year: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "Year",
+    //   required: true,
+    // },
     logo: {
       type: String,
     },

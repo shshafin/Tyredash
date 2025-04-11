@@ -37,4 +37,4 @@ ModelSchema.statics.isModelExist = async function (
   return await this.findOne({ id });
 };
 
-export const Model = model<IModel, ICarModel>("CarModel", ModelSchema);
+export const CarModel = model<IModel, ICarModel>("CarModel", ModelSchema);

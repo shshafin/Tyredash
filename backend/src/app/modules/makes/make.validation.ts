@@ -5,9 +5,9 @@ const createMakeZodSchema = z.object({
     make: z.string({
       required_error: "Make name is required",
     }),
-    year: z.string({
-      required_error: "Year is required",
-    }),
+    // year: z.string({
+    //   required_error: "Year is required",
+    // }),
     logo: z.string().optional(),
   }),
 });
