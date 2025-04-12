@@ -6,7 +6,7 @@ import { UserValidation } from "./user.validation";
 const router = express.Router();
 
 router.get("/", UserController.getUsers);
-router.get("/:id", UserController.FindSingleUser);
+router.get("/:email", UserController.FindSingleUser);
 
 router.post(
   "/create",

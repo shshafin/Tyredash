@@ -39,8 +39,8 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
 
 // find single user
 const FindSingleUser = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const result = await UserService.getSingleUser(id);
+  const email = req.params.email;
+  const result = await UserService.getSingleUser(email);
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
     success: true,

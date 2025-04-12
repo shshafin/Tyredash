@@ -79,8 +79,8 @@ const getUsers = async (
   };
 };
 
-const getSingleUser = async (id: string): Promise<IUser | null> => {
-  const result = await User.findOne({ id });
+const getSingleUser = async (email: string): Promise<IUser | null> => {
+  const result = await User.findOne({ email: email });
   return result;
 };
 
