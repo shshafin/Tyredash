@@ -9,12 +9,22 @@ export const wheelFilterableFields = [
   "make",
   "model",
   "year",
+  "price",
+  "stockQuantity",
+  "constructionType",
+  "materialType",
+  "RimDiameter",
+  "RimWidth",
 ];
 
 export const wheelSearchableFields = [
   "name",
+  "description",
   "boltPattern",
   "wheelType",
+  "constructionType",
   "category",
+  "productLine",
   "finish",
+  "wheelColor",
 ];

@@ -44,7 +44,8 @@ export interface IWheel extends Document {
 }
 
 export type IWheelModel = Model<IWheel, Record<string, unknown>>;
-export type IWheelFilters = {
+
+export interface IWheelFilters {
   searchTerm?: string;
   name?: string;
   boltPattern?: string;
@@ -55,4 +56,11 @@ export type IWheelFilters = {
   make?: string;
   model?: string;
   year?: string;
-};
+  price?: number;
+  stockQuantity?: number;
+  constructionType?: string;
+  materialType?: string;
+  RimDiameter?: number;
+  RimWidth?: number;
+  [key: string]: any;
+}

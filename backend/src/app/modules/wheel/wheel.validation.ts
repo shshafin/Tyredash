@@ -4,7 +4,7 @@ const createWheelZodSchema = z.object({
   body: z.object({
     name: z.string({
       required_error: "Name is required",
-    }),
+    }).trim(),
     year: z.string({
       required_error: "Year is required",
     }),
@@ -23,6 +23,25 @@ const createWheelZodSchema = z.object({
     brand: z.string({
       required_error: "Brand is required",
     }),
+    category: z.string({
+      required_error: "Category is required",
+    }),
+    description: z.string().optional(),
+    images: z.array(z.string()).optional(),
+    productLine: z.array(z.string()).optional(),
+    unitName: z.string().optional(),
+    grossWeight: z.string().optional(),
+    conditionInfo: z.string().optional(),
+    GTIN: z.string().optional(),
+    ATVOffset: z.string().optional(),
+    BoltsQuantity: z.string().optional(),
+    wheelColor: z.string().optional(),
+    hubBore: z.string().optional(),
+    materialType: z.string().optional(),
+    wheelSize: z.string().optional(),
+    wheelAccent: z.string().optional(),
+    wheelPieces: z.string().optional(),
+    wheelWidth: z.string().optional(),
     RimDiameter: z.number({
       required_error: "Rim diameter is required",
     }),
@@ -44,6 +63,7 @@ const createWheelZodSchema = z.object({
     loadCapacity: z.number({
       required_error: "Load capacity is required",
     }),
+    loadRating: z.number().optional(),
     finish: z.string({
       required_error: "Finish is required",
     }),
@@ -56,15 +76,13 @@ const createWheelZodSchema = z.object({
     wheelType: z.string({
       required_error: "Wheel type is required",
     }),
-    category: z.string({
-      required_error: "Category is required",
-    }),
     wheelStockQuantity: z.number({
       required_error: "Wheel stock quantity is required",
     }),
     price: z.number({
       required_error: "Price is required",
     }),
+    discountPrice: z.number().optional(),
     stockQuantity: z.number({
       required_error: "Stock quantity is required",
     }),
@@ -73,13 +91,30 @@ const createWheelZodSchema = z.object({
 
 const updateWheelZodSchema = z.object({
   body: z.object({
-    name: z.string().optional(),
+    name: z.string().trim().optional(),
     year: z.string().optional(),
     make: z.string().optional(),
     model: z.string().optional(),
     trim: z.string().optional(),
     tireSize: z.string().optional(),
     brand: z.string().optional(),
+    category: z.string().optional(),
+    description: z.string().optional(),
+    images: z.array(z.string()).optional(),
+    productLine: z.array(z.string()).optional(),
+    unitName: z.string().optional(),
+    grossWeight: z.string().optional(),
+    conditionInfo: z.string().optional(),
+    GTIN: z.string().optional(),
+    ATVOffset: z.string().optional(),
+    BoltsQuantity: z.string().optional(),
+    wheelColor: z.string().optional(),
+    hubBore: z.string().optional(),
+    materialType: z.string().optional(),
+    wheelSize: z.string().optional(),
+    wheelAccent: z.string().optional(),
+    wheelPieces: z.string().optional(),
+    wheelWidth: z.string().optional(),
     RimDiameter: z.number().optional(),
     RimWidth: z.number().optional(),
     boltPattern: z.string().optional(),
@@ -87,13 +122,14 @@ const updateWheelZodSchema = z.object({
     hubBoreSize: z.number().optional(),
     numberOFBolts: z.number().optional(),
     loadCapacity: z.number().optional(),
+    loadRating: z.number().optional(),
     finish: z.string().optional(),
     warranty: z.string().optional(),
     constructionType: z.string().optional(),
     wheelType: z.string().optional(),
-    category: z.string().optional(),
     wheelStockQuantity: z.number().optional(),
     price: z.number().optional(),
+    discountPrice: z.number().optional(),
     stockQuantity: z.number().optional(),
   }),
 });
