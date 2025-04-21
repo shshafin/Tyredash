@@ -37,6 +37,7 @@ const getAllTireSizes = async (
     .populate("make")
     .populate("model")
     .populate("year")
+    .populate("trim")
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);

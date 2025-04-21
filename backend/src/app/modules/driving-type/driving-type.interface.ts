@@ -2,7 +2,7 @@ import { Model, Types } from "mongoose";
 
 export interface IDrivingType {
   title: string;
-  subTItle: string;
+  subTitle: string;
   options: string[];
 }
 

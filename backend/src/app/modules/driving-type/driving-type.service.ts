@@ -32,7 +32,7 @@ const getAllDrivingTypes = async (
   }
 
   const result = await DrivingType.find()
-    .populate("year")
+    // .populate("year")
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);

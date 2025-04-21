@@ -7,7 +7,7 @@ const DrivingTypeSchema = new Schema<IDrivingType, IDrivingTypeModel>(
       type: String,
       required: true,
     },
-    subTItle: {
+    subTitle: {
       type: String,
       required: true,
     },
