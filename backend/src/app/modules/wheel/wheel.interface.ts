@@ -8,6 +8,23 @@ export interface IWheel extends Document {
   trim: Types.ObjectId;
   tireSize: Types.ObjectId;
   brand: Types.ObjectId;
+  description: string;
+  image: [string];
+  category: Types.ObjectId;
+  productLine: [string];
+  unitName: string;
+  grossWeight: string;
+  conditionInfo: string;
+  GTIN: string;
+  ATVOffset: string;
+  BoltsQuantity: string;
+  wheelColor: string;
+  hubBore: string;
+  materialType: string;
+  wheelSize: string;
+  wheelAccent: string;
+  wheelPieces: string;
+  wheelWidth: string;
   RimDiameter: number;
   RimWidth: number;
   boltPattern: string;
@@ -15,13 +32,14 @@ export interface IWheel extends Document {
   hubBoreSize: number;
   numberOFBolts: number;
   loadCapacity: number;
+  loadRating: number;
   finish: string;
   warranty: string;
   constructionType: string;
   wheelType: string;
-  category: string;
   wheelStockQuantity: number;
   price: number;
+  discountPrice: number;
   stockQuantity: number;
 }
 

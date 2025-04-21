@@ -1,4 +1,4 @@
-import { Schema, Types, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import { IWheel, IWheelModel } from "./wheel.interface";
 
 const WheelSchema = new Schema<IWheel, IWheelModel>(
@@ -38,6 +38,61 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
       ref: "Brand",
       required: true,
     },
+    description: {
+      type: String,
+    },
+    images: {
+      type: [String],
+      default: [],
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
+    productLine: {
+      type: [String],
+      default: [],
+    },
+    unitName: {
+      type: String,
+    },
+    grossWeight: {
+      type: String,
+    },
+    conditionInfo: {
+      type: String,
+    },
+    GTIN: {
+      type: String,
+    },
+    ATVOffset: {
+      type: String,
+    },
+    BoltsQuantity: {
+      type: String,
+    },
+    wheelColor: {
+      type: String,
+    },
+    hubBore: {
+      type: String,
+    },
+    materialType: {
+      type: String,
+    },
+    wheelSize: {
+      type: String,
+    },
+    wheelAccent: {
+      type: String,
+    },
+    wheelPieces: {
+      type: String,
+    },
+    wheelWidth: {
+      type: String,
+    },
     RimDiameter: {
       type: Number,
       required: true,
@@ -66,6 +121,9 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
       type: Number,
       required: true,
     },
+    loadRating: {
+      type: Number,
+    },
     finish: {
       type: String,
       required: true,
@@ -82,10 +140,6 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
       type: String,
       required: true,
     },
-    category: {
-      type: String,
-      required: true,
-    },
     wheelStockQuantity: {
       type: Number,
       required: true,
@@ -93,6 +147,9 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
     price: {
       type: Number,
       required: true,
+    },
+    discountPrice: {
+      type: Number,
     },
     stockQuantity: {
       type: Number,
@@ -106,5 +163,13 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
     },
   }
 );
+
+// Add text index for search
+WheelSchema.index({
+  name: "text",
+  description: "text",
+  wheelType: "text",
+  constructionType: "text",
+});
 
 export const Wheel = model<IWheel, IWheelModel>("Wheel", WheelSchema);

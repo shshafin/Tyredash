@@ -2,9 +2,11 @@ import { z } from "zod";
 
 const createTireZodSchema = z.object({
   body: z.object({
-    name: z.string({
-      required_error: "Name is required",
-    }),
+    name: z
+      .string({
+        required_error: "Name is required",
+      })
+      .trim(),
     year: z.string({
       required_error: "Year is required",
     }),
@@ -23,6 +25,30 @@ const createTireZodSchema = z.object({
     brand: z.string({
       required_error: "Brand is required",
     }),
+    category: z.string({
+      required_error: "Category is required",
+    }),
+    description: z.string().optional(),
+    images: z.array(z.string()).optional(),
+    productLine: z.array(z.string()).optional(),
+    unitName: z.string().optional(),
+    conditionInfo: z.string().optional(),
+    grossWeightRange: z.string().optional(),
+    gtinRange: z.string().optional(),
+    loadIndexRange: z.string().optional(),
+    mileageWarrantyRange: z.string().optional(),
+    maxAirPressureRange: z.string().optional(),
+    speedRatingRange: z.string().optional(),
+    sidewallDescriptionRange: z.string().optional(),
+    temperatureGradeRange: z.string().optional(),
+    sectionWidthRange: z.string().optional(),
+    diameterRange: z.number().optional(),
+    wheelRimDiameterRange: z.string().optional(),
+    tractionGradeRange: z.string().optional(),
+    treadDepthRange: z.string().optional(),
+    treadWidthRange: z.string().optional(),
+    overallWidthRange: z.string().optional(),
+    treadwearGradeRange: z.string().optional(),
     sectionWidth: z.number({
       required_error: "Section width is required",
     }),
@@ -53,12 +79,6 @@ const createTireZodSchema = z.object({
     maxPSI: z.number({
       required_error: "Max PSI is required",
     }),
-    speedRating: z.string({
-      required_error: "Speed rating is required",
-    }),
-    sidewallDese: z.string({
-      required_error: "Sidewall description is required",
-    }),
     warranty: z.string({
       required_error: "Warranty is required",
     }),
@@ -77,15 +97,10 @@ const createTireZodSchema = z.object({
     tireType: z.string({
       required_error: "Tire type is required",
     }),
-    category: z.string({
-      required_error: "Category is required",
-    }),
-    diameter: z.number({
-      required_error: "Diameter is required",
-    }),
     price: z.number({
       required_error: "Price is required",
     }),
+    discountPrice: z.number().optional(),
     stockQuantity: z.number({
       required_error: "Stock quantity is required",
     }),
@@ -94,13 +109,35 @@ const createTireZodSchema = z.object({
 
 const updateTireZodSchema = z.object({
   body: z.object({
-    name: z.string().optional(),
+    name: z.string().trim().optional(),
     year: z.string().optional(),
     make: z.string().optional(),
     model: z.string().optional(),
     trim: z.string().optional(),
     tireSize: z.string().optional(),
     brand: z.string().optional(),
+    category: z.string().optional(),
+    description: z.string().optional(),
+    images: z.array(z.string()).optional(),
+    productLine: z.array(z.string()).optional(),
+    unitName: z.string().optional(),
+    conditionInfo: z.string().optional(),
+    grossWeightRange: z.string().optional(),
+    gtinRange: z.string().optional(),
+    loadIndexRange: z.string().optional(),
+    mileageWarrantyRange: z.string().optional(),
+    maxAirPressureRange: z.string().optional(),
+    speedRatingRange: z.string().optional(),
+    sidewallDescriptionRange: z.string().optional(),
+    temperatureGradeRange: z.string().optional(),
+    sectionWidthRange: z.string().optional(),
+    diameterRange: z.number().optional(),
+    wheelRimDiameterRange: z.string().optional(),
+    tractionGradeRange: z.string().optional(),
+    treadDepthRange: z.string().optional(),
+    treadWidthRange: z.string().optional(),
+    overallWidthRange: z.string().optional(),
+    treadwearGradeRange: z.string().optional(),
     sectionWidth: z.number().optional(),
     aspectRatio: z.number().optional(),
     rimDiameter: z.number().optional(),
@@ -111,17 +148,14 @@ const updateTireZodSchema = z.object({
     loadIndex: z.number().optional(),
     loadRange: z.string().optional(),
     maxPSI: z.number().optional(),
-    speedRating: z.string().optional(),
-    sidewallDese: z.string().optional(),
     warranty: z.string().optional(),
     aspectRatioRange: z.string().optional(),
     treadPattern: z.string().optional(),
     loadCapacity: z.number().optional(),
     constructionType: z.string().optional(),
     tireType: z.string().optional(),
-    category: z.string().optional(),
-    diameter: z.number().optional(),
     price: z.number().optional(),
+    discountPrice: z.number().optional(),
     stockQuantity: z.number().optional(),
   }),
 });

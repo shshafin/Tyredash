@@ -6,6 +6,7 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { SortOrder } from "mongoose";
 import { ITire, ITireFilters } from "./tire.interface";
+import { tireSearchableFields } from "./tire.constants";
 
 const createTire = async (tireData: ITire): Promise<ITire> => {
   const result = await Tire.create(tireData);
@@ -24,22 +25,29 @@ const getAllTires = async (
 
   if (searchTerm) {
     andConditions.push({
-      $or: ["name", "loadRange", "speedRating", "tireType", "category"].map(
-        (field) => ({
-          [field]: {
-            $regex: searchTerm,
-            $options: "i",
-          },
-        })
-      ),
+      $or: tireSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
     });
   }
 
   if (Object.keys(filtersData).length) {
     andConditions.push({
-      $and: Object.entries(filtersData).map(([field, value]) => ({
-        [field]: value,
-      })),
+      $and: Object.entries(filtersData).map(([field, value]) => {
+        if (
+          field === "price" ||
+          field === "stockQuantity" ||
+          field === "sectionWidth" ||
+          field === "aspectRatio" ||
+          field === "rimDiameter"
+        ) {
+          return { [field]: Number(value) };
+        }
+        return { [field]: value };
+      }),
     });
   }
 
@@ -52,7 +60,7 @@ const getAllTires = async (
     andConditions.length > 0 ? { $and: andConditions } : {};
 
   const result = await Tire.find(whereConditions)
-    .populate("year make model trim tireSize brand")
+    .populate("year make model trim tireSize brand category")
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
