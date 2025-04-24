@@ -11,7 +11,7 @@ const createMake = async (payload: IMake): Promise<IMake | null> => {
 };
 
 const getSingleMake = async (id: string): Promise<IMake | null> => {
-  const result = await Make.findById(id).populate("year");
+  const result = await Make.findById(id);
   return result;
 };
 
@@ -27,11 +27,7 @@ const getAllMakes = async (
     sortConditions[sortBy] = sortOrder;
   }
 
-  const result = await Make.find()
-    .populate("year")
-    .sort(sortConditions)
-    .skip(skip)
-    .limit(limit);
+  const result = await Make.find().sort(sortConditions).skip(skip).limit(limit);
 
   const total = await Make.countDocuments();
 
@@ -49,9 +45,7 @@ const updateMake = async (
   id: string,
   payload: Partial<IMake>
 ): Promise<IMake | null> => {
-  const result = await Make.findByIdAndUpdate(id, payload, {
-    new: true,
-  }).populate("year");
+  const result = await Make.findByIdAndUpdate(id, payload, { new: true });
   return result;
 };
 

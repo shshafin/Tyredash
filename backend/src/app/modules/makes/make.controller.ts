@@ -6,9 +6,25 @@ import { MakeService } from "./make.service";
 import { IMake } from "./make.interface";
 import { paginationFields } from "../../../constants/pagination";
 import pick from "../../../shared/pick";
+import { deleteFile, getFileUrl } from "../../../helpers/fileHandlers";
+import ApiError from "../../../errors/ApiError";
+import { Make } from "./make.model";
 
 const createMake = catchAsync(async (req: Request, res: Response) => {
   const { ...makeData } = req.body;
+
+  const existingMake = await Make.findOne({ make: makeData.make });
+  if (existingMake) {
+    if (req.file) {
+      deleteFile(req.file.filename);
+    }
+    throw new ApiError(httpStatus.BAD_REQUEST, "Make already exists");
+  }
+
+  if (req.file) {
+    makeData.logo = getFileUrl(req.file.filename);
+  }
+
   const result = await MakeService.createMake(makeData);
 
   sendResponse<IMake>(res, {
@@ -47,7 +63,22 @@ const getAllMakes = catchAsync(async (req: Request, res: Response) => {
 
 const updateMake = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await MakeService.updateMake(id, req.body);
+  const { ...updateData } = req.body;
+
+  const existingMake = await Make.findById(id);
+  if (!existingMake) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Make not found");
+  }
+
+  if (req.file) {
+    if (existingMake.logo) {
+      const oldFilename = existingMake.logo.split("/").pop();
+      deleteFile(oldFilename ?? "");
+    }
+    updateData.logo = getFileUrl(req.file.filename);
+  }
+
+  const result = await MakeService.updateMake(id, updateData);
 
   sendResponse<IMake>(res, {
     statusCode: httpStatus.OK,
@@ -59,6 +90,17 @@ const updateMake = catchAsync(async (req: Request, res: Response) => {
 
 const deleteMake = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
+
+  const make = await MakeService.getSingleMake(id);
+  if (!make) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Make not found");
+  }
+
+  if (make.logo) {
+    const filename = make.logo.split("/").pop();
+    deleteFile(filename ?? "");
+  }
+
   const result = await MakeService.deleteMake(id);
 
   sendResponse<IMake>(res, {

@@ -3,6 +3,7 @@ import cors from "cors";
 import httpStatus from "http-status";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import modulesRoutes from "./app/routes";
+import path from "path";
 
 const app: Application = express();
 
@@ -11,6 +12,7 @@ app.use(cors());
 // parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/storage", express.static(path.join(__dirname, "../public/storage")));
 
 // app.get("/", (req, res) => {
 //   res.send("Hello World!");
