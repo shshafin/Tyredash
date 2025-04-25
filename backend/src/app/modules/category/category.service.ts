@@ -1,9 +1,10 @@
-import { ICategory } from "./category.interface";
+import { ICategory, ICategoryFilters } from "./category.interface";
 import { Category } from "./category.model";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
-import { SortOrder } from "mongoose";
+import { SortOrder, Types } from "mongoose";
+import { categorySearchableFields } from "./category.constants";
 
 const createCategory = async (
   payload: ICategory
@@ -18,38 +19,61 @@ const getSingleCategory = async (id: string): Promise<ICategory | null> => {
 };
 
 const getAllCategories = async (
-  filters: { searchTerm?: string },
+  filters: ICategoryFilters,
   paginationOptions: IPaginationOptions
 ): Promise<IGenericResponse<ICategory[]>> => {
+  const { searchTerm, ...filtersData } = filters;
   const { limit, page, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
 
   const andConditions = [];
 
-  if (filters.searchTerm) {
+  // Search implementation
+  if (searchTerm) {
     andConditions.push({
-      $or: [
-        { name: { $regex: filters.searchTerm, $options: "i" } },
-        { slug: { $regex: filters.searchTerm, $options: "i" } },
-      ],
+      $or: categorySearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
     });
   }
 
-  // Dynamic  Sort needs  field to  do sorting
+  // Filters implementation
+  if (Object.keys(filtersData).length) {
+    const filterConditions = Object.entries(filtersData).map(
+      ([field, value]) => {
+        if (field === "parentCategory") {
+          return {
+            [field]:
+              typeof value === "string" && Types.ObjectId.isValid(value)
+                ? new Types.ObjectId(value)
+                : value,
+          };
+        }
+        return { [field]: value };
+      }
+    );
+    andConditions.push({ $and: filterConditions });
+  }
+
   const sortConditions: { [key: string]: SortOrder } = {};
   if (sortBy && sortOrder) {
     sortConditions[sortBy] = sortOrder;
   }
-  const result = await Category.find(
-    andConditions.length > 0 ? { $and: andConditions } : {}
-  )
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await Category.find(whereConditions)
+    .populate("parentCategory")
+    .populate("children")
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
 
-  const total = await Category.countDocuments(
-    andConditions.length > 0 ? { $and: andConditions } : {}
-  );
+  const total = await Category.countDocuments(whereConditions);
 
   return {
     meta: {

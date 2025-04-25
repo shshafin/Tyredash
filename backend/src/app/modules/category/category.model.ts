@@ -10,12 +10,7 @@ const CategorySchema = new Schema<ICategory, ICategoryModel>(
     },
     slug: {
       type: String,
-      required: true,
       unique: true,
-    },
-    description: {
-      type: String,
-      default: "",
     },
     parentCategory: {
       type: Schema.Types.ObjectId,
@@ -25,6 +20,10 @@ const CategorySchema = new Schema<ICategory, ICategoryModel>(
     image: {
       type: String,
       default: "",
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -37,6 +36,12 @@ const CategorySchema = new Schema<ICategory, ICategoryModel>(
 
 // Index for slug (ensure uniqueness)
 CategorySchema.index({ name: 1, slug: 1 }, { unique: true });
+
+CategorySchema.virtual("children", {
+  ref: "Category",
+  localField: "_id",
+  foreignField: "parentCategory",
+});
 
 export const Category = model<ICategory, ICategoryModel>(
   "Category",
