@@ -6,6 +6,7 @@ import { paginationFields } from "../../../constants/pagination";
 import pick from "../../../shared/pick";
 import { DrivingTypeService } from "./driving-type.service";
 import { IDrivingType } from "./driving-type.interface";
+import { drivingTypeFilterableFields } from "./driving-type.constants";
 
 const createDrivingType = catchAsync(async (req: Request, res: Response) => {
   const { ...makeData } = req.body;
@@ -32,9 +33,13 @@ const getSingleDrivingType = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllDrivingTypes = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, drivingTypeFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
 
-  const result = await DrivingTypeService.getAllDrivingTypes(paginationOptions);
+  const result = await DrivingTypeService.getAllDrivingTypes(
+    paginationOptions,
+    filters
+  );
 
   sendResponse<IDrivingType[]>(res, {
     statusCode: httpStatus.OK,

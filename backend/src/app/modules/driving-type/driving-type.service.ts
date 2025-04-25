@@ -2,8 +2,9 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { SortOrder } from "mongoose";
-import { IDrivingType } from "./driving-type.interface";
+import { IDrivingType, IDrivingTypeFilters } from "./driving-type.interface";
 import { DrivingType } from "./driving-type.model";
+import { drivingTypeSearchableFields } from "./driving-type.constants";
 
 const createDrivingType = async (
   payload: IDrivingType
@@ -20,24 +21,51 @@ const getSingleDrivingType = async (
 };
 
 const getAllDrivingTypes = async (
+  filters: IDrivingTypeFilters,
   paginationOptions: IPaginationOptions
 ): Promise<IGenericResponse<IDrivingType[]>> => {
+  const { searchTerm, ...filtersData } = filters;
   const { limit, page, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
 
-  // Dynamic  Sort needs  field to  do sorting
+  const andConditions = [];
+
+  // Search implementation
+  if (searchTerm) {
+    andConditions.push({
+      $or: drivingTypeSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  // Filters implementation
+  if (Object.keys(filtersData).length) {
+    const filterConditions = Object.entries(filtersData).map(
+      ([field, value]) => ({
+        [field]: value,
+      })
+    );
+    andConditions.push({ $and: filterConditions });
+  }
+
   const sortConditions: { [key: string]: SortOrder } = {};
   if (sortBy && sortOrder) {
     sortConditions[sortBy] = sortOrder;
   }
 
-  const result = await DrivingType.find()
-    // .populate("year")
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await DrivingType.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
 
-  const total = await DrivingType.countDocuments();
+  const total = await DrivingType.countDocuments(whereConditions);
 
   return {
     meta: {
@@ -48,7 +76,6 @@ const getAllDrivingTypes = async (
     data: result,
   };
 };
-
 const updateDrivingType = async (
   id: string,
   payload: Partial<IDrivingType>

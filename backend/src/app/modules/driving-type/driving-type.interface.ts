@@ -7,6 +7,10 @@ export interface IDrivingType {
 }
 
 export type IDrivingTypeModel = Model<IDrivingType, Record<string, unknown>>;
-export type IDrivingTypeFilters = {
+
+export interface IDrivingTypeFilters {
   searchTerm?: string;
-};
+  title?: string;
+  subTitle?: string;
+  options?: string[];
+}

@@ -5,7 +5,7 @@ const createDrivingTypeZodSchema = z.object({
     title: z.string({
       required_error: "Title is required",
     }),
-    subTItle: z.string({
+    subTitle: z.string({
       required_error: "Subtitle is required",
     }),
     options: z.array(z.string()).nonempty({
