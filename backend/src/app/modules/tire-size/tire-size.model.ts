@@ -1,7 +1,7 @@
 import { Schema, Types, model } from "mongoose";
 import { ITireSize, ITireSizeModel } from "./tire-size.interface";
 
-const TrimSchema = new Schema<ITireSize, ITireSizeModel>(
+const TireSizeSchema = new Schema<ITireSize, ITireSizeModel>(
   {
     tireSize: {
       type: String,
@@ -41,5 +41,5 @@ const TrimSchema = new Schema<ITireSize, ITireSizeModel>(
 
 export const TireSize = model<ITireSize, ITireSizeModel>(
   "TireSize",
-  TrimSchema
+  TireSizeSchema
 );

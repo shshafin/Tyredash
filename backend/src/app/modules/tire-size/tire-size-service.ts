@@ -2,8 +2,10 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { SortOrder } from "mongoose";
-import { ITireSize } from "./tire-size.interface";
+import { ITireSize, ITireSizeFilters } from "./tire-size.interface";
 import { TireSize } from "./tire-size.model";
+import { Types } from "mongoose";
+import { tireSizeSearchableFields } from "./tire-size.constants";
 
 const createTireSize = async (
   payload: ITireSize
@@ -22,18 +24,50 @@ const getSingleTireSize = async (id: string): Promise<ITireSize | null> => {
 };
 
 const getAllTireSizes = async (
+  filters: ITireSizeFilters,
   paginationOptions: IPaginationOptions
 ): Promise<IGenericResponse<ITireSize[]>> => {
+  const { searchTerm, ...filtersData } = filters;
   const { limit, page, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
 
-  // Dynamic  Sort needs  field to  do sorting
+  const andConditions = [];
+
+  // Search implementation
+  if (searchTerm) {
+    andConditions.push({
+      $or: tireSizeSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  // Filters implementation
+  if (Object.keys(filtersData).length) {
+    const filterConditions = Object.entries(filtersData).map(
+      ([field, value]) => {
+        // Handle ObjectId fields (make, model, year, trim)
+        if (["make", "model", "year", "trim"].includes(field)) {
+          return { [field]: new Types.ObjectId(value) };
+        }
+        return { [field]: value };
+      }
+    );
+    andConditions.push({ $and: filterConditions });
+  }
+
   const sortConditions: { [key: string]: SortOrder } = {};
   if (sortBy && sortOrder) {
     sortConditions[sortBy] = sortOrder;
   }
 
-  const result = await TireSize.find()
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await TireSize.find(whereConditions)
     .populate("make")
     .populate("model")
     .populate("year")
@@ -42,7 +76,7 @@ const getAllTireSizes = async (
     .skip(skip)
     .limit(limit);
 
-  const total = await TireSize.countDocuments();
+  const total = await TireSize.countDocuments(whereConditions);
 
   return {
     meta: {

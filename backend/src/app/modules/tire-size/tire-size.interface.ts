@@ -9,6 +9,13 @@ export interface ITireSize extends Document {
 }
 
 export type ITireSizeModel = Model<ITireSize, Record<string, unknown>>;
-export type ITireSizeFilters = {
+export interface ITireSizeFilters {
   searchTerm?: string;
-};
+  tireSize?: string;
+  year?: Types.ObjectId | string;
+  make?: Types.ObjectId | string;
+  model?: Types.ObjectId | string;
+  trim?: Types.ObjectId | string;
+}
+
+const tireSizeSearchableFields = ["tireSize"];

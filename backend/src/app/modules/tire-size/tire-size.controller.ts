@@ -7,6 +7,7 @@ import { paginationFields } from "../../../constants/pagination";
 
 import { ITireSize } from "./tire-size.interface";
 import { TireService } from "./tire-size-service";
+import { tireSizeFilterableFields } from "./tire-size.constants";
 
 const createTireSize = catchAsync(async (req: Request, res: Response) => {
   const { ...trimData } = req.body;
@@ -33,9 +34,10 @@ const getSingleTireSize = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllTireSizes = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, tireSizeFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
 
-  const result = await TireService.getAllTireSizes(paginationOptions);
+  const result = await TireService.getAllTireSizes(paginationOptions, filters);
 
   sendResponse<ITireSize[]>(res, {
     statusCode: httpStatus.OK,

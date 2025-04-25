@@ -46,8 +46,8 @@ const modulesRoutes = [
     module: TrimRoutes,
   },
   {
-    path: "/categories",
-    module: CategoryRoutes,
+    path: "/tiresizes",
+    module: TireSizeRoutes,
   },
   {
     path: "/categories",
@@ -56,10 +56,6 @@ const modulesRoutes = [
   {
     path: "/products",
     module: ProductRoutes,
-  },
-  {
-    path: "/tire-size",
-    module: TireSizeRoutes,
   },
   {
     path: "/driving-type",
