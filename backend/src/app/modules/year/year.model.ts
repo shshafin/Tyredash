@@ -5,18 +5,11 @@ import { IYear, IYearModel } from "./year.interface";
 const YearSchema = new Schema<IYear, IYearModel>(
   {
     year: {
-      numeric: {
-        type: Number,
-        required: true,
-        min: 1900,
-        max: new Date().getFullYear() + 1,
-      },
-      display: {
-        type: String,
-        required: true,
-      },
+      type: Number,
+      required: true,
     },
   },
+
   {
     timestamps: true,
     toJSON: {
