@@ -38,3 +38,10 @@ ModelSchema.statics.isModelExist = async function (
 };
 
 export const CarModel = model<IModel, ICarModel>("CarModel", ModelSchema);
+
+export interface IModelFilters {
+  searchTerm?: string;
+  model?: string;
+  make?: Types.ObjectId | string;
+  year?: Types.ObjectId | string;
+}

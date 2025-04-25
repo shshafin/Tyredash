@@ -6,6 +6,7 @@ import { ModelService } from "./model.service";
 import { IModel } from "./model.interface";
 import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
+import { modelFilterableFields } from "./model.constants";
 
 const createModel = catchAsync(async (req: Request, res: Response) => {
   const { ...modelData } = req.body;
@@ -32,9 +33,10 @@ const getSingleModel = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllModels = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, modelFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
 
-  const result = await ModelService.getAllModels(paginationOptions);
+  const result = await ModelService.getAllModels(paginationOptions, filters);
 
   sendResponse<IModel[]>(res, {
     statusCode: httpStatus.OK,
