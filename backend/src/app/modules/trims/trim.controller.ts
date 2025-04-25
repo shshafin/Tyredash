@@ -6,6 +6,7 @@ import { TrimService } from "./trim.service";
 import { ITrim } from "./trim.interface";
 import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
+import { modelFilterableFields } from "../models/model.constants";
 
 const createTrim = catchAsync(async (req: Request, res: Response) => {
   const { ...trimData } = req.body;
@@ -32,9 +33,10 @@ const getSingleTrim = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllTrims = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, modelFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
 
-  const result = await TrimService.getAllTrims(paginationOptions);
+  const result = await TrimService.getAllTrims(paginationOptions, filters);
 
   sendResponse<ITrim[]>(res, {
     statusCode: httpStatus.OK,

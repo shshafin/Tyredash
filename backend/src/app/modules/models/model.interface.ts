@@ -11,3 +11,10 @@ export type ICarModel = Model<IModel, Record<string, unknown>>;
 export type ICarFilters = {
   searchTerm?: string;
 };
+
+export interface IModelFilters {
+  searchTerm?: string;
+  model?: string;
+  make?: Types.ObjectId | string;
+  year?: Types.ObjectId | string;
+}

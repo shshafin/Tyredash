@@ -32,9 +32,6 @@ const TrimSchema = new Schema<ITrim, ITrimModel>(
   }
 );
 
-// Indexes
-// ModelSchema.index({ name: 1, make: 1, year: 1 }, { unique: true });
-
 // Static method
 TrimSchema.statics.isModelExist = async function (
   id: string

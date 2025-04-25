@@ -38,10 +38,6 @@ const modulesRoutes = [
     module: MakeRoutes,
   },
   {
-    path: "/makes",
-    module: MakeRoutes,
-  },
-  {
     path: "/models",
     module: ModelRoutes,
   },

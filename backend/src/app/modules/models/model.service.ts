@@ -1,5 +1,5 @@
-import { IModel } from "./model.interface";
-import { CarModel, IModelFilters } from "./model.model";
+import { IModel, IModelFilters } from "./model.interface";
+import { CarModel } from "./model.model";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { paginationHelpers } from "../../../helpers/paginationHelper";

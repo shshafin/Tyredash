@@ -11,6 +11,11 @@ export interface ITrim extends Document {
 }
 
 export type ITrimModel = Model<ITrim, Record<string, unknown>>;
-export type ITrimFilters = {
+
+export interface ITrimFilters {
   searchTerm?: string;
-};
+  trim?: string;
+  make?: Types.ObjectId | string;
+  model?: Types.ObjectId | string;
+  year?: Types.ObjectId | string;
+}

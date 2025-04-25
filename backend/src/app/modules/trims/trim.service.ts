@@ -1,14 +1,15 @@
-import { ITrim } from "./trim.interface";
+import { ITrim, ITrimFilters } from "./trim.interface";
 import { Trim } from "./trim.model";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
-import { SortOrder } from "mongoose";
+import { SortOrder, Types } from "mongoose";
 import * as fs from "fs";
 import { Year } from "../year/year.model";
 import csvParser from "csv-parser";
 import { Make } from "../makes/make.model";
 import { CarModel } from "../models/model.model";
+import { trimSearchableFields } from "./trim.constants";
 
 const createTrim = async (payload: ITrim): Promise<ITrim | null> => {
   const result = await Trim.create(payload);
@@ -24,18 +25,48 @@ const getSingleTrim = async (id: string): Promise<ITrim | null> => {
 };
 
 const getAllTrims = async (
+  filters: ITrimFilters,
   paginationOptions: IPaginationOptions
 ): Promise<IGenericResponse<ITrim[]>> => {
+  const { searchTerm, ...filtersData } = filters;
   const { limit, page, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
 
-  // Dynamic  Sort needs  field to  do sorting
+  const andConditions = [];
+
+  // Search implementation
+  if (searchTerm) {
+    andConditions.push({
+      $or: trimSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filtersData).length) {
+    const filterConditions = Object.entries(filtersData).map(
+      ([field, value]) => {
+        if (["make", "model", "year"].includes(field)) {
+          return { [field]: new Types.ObjectId(value) };
+        }
+        return { [field]: value };
+      }
+    );
+    andConditions.push({ $and: filterConditions });
+  }
+
   const sortConditions: { [key: string]: SortOrder } = {};
   if (sortBy && sortOrder) {
     sortConditions[sortBy] = sortOrder;
   }
 
-  const result = await Trim.find()
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await Trim.find(whereConditions)
     .populate("make")
     .populate("model")
     .populate("year")
@@ -43,7 +74,7 @@ const getAllTrims = async (
     .skip(skip)
     .limit(limit);
 
-  const total = await Trim.countDocuments();
+  const total = await Trim.countDocuments(whereConditions);
 
   return {
     meta: {
