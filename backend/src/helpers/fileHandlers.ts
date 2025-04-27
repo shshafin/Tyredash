@@ -44,7 +44,7 @@ export const uploadImage = multer({
   storage: storage,
   fileFilter: imageFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
-}).single("image");
+}).single("file");
 
 export const uploadImages = multer({
   storage: storage,

@@ -39,6 +39,11 @@
             "date": 1745601107470,
             "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-25-04-23-success.log",
             "hash": "ef3d7a81428c5eb7568d8f56428e298346debe8863961f9194fc0582a28bc1ee"
+        },
+        {
+            "date": 1745754112040,
+            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-27-04-17-success.log",
+            "hash": "521d27ffabf884b52b0175446f693edc241aef5d63a177ffb1b8a2807433b538"
         }
     ],
     "hashType": "sha256"

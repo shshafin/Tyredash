@@ -6,9 +6,26 @@ import { CategoryService } from "./category.service";
 import { ICategory } from "./category.interface";
 import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
+import { Category } from "./category.model";
+import { deleteFile, getFileUrl } from "../../../helpers/fileHandlers";
+import ApiError from "../../../errors/ApiError";
 
 const createCategory = catchAsync(async (req: Request, res: Response) => {
-  const result = await CategoryService.createCategory(req.body);
+  const { ...categoryData } = req.body;
+
+  const existingCategory = await Category.findOne({ name: categoryData.name });
+  if (existingCategory) {
+    if (req.file) {
+      deleteFile(req.file.filename);
+    }
+    throw new ApiError(httpStatus.BAD_REQUEST, "Category already exists");
+  }
+
+  if (req.file) {
+    categoryData.image = getFileUrl(req.file.filename);
+  }
+
+  const result = await CategoryService.createCategory(categoryData);
 
   sendResponse<ICategory>(res, {
     statusCode: httpStatus.OK,
