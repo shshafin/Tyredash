@@ -1,6 +1,6 @@
 import { Model, Types } from "mongoose";
 
-export interface IWheel extends Document {
+export interface IWheel {
   name: string;
   year: Types.ObjectId;
   make: Types.ObjectId;
@@ -9,7 +9,7 @@ export interface IWheel extends Document {
   tireSize: Types.ObjectId;
   brand: Types.ObjectId;
   description: string;
-  image: [string];
+  images: string[];
   category: Types.ObjectId;
   productLine: [string];
   unitName: string;
