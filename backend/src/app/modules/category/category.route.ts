@@ -24,6 +24,7 @@ router.get("/", CategoryController.getAllCategories);
 router.patch(
   "/:id",
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  uploadImage,
   validateRequest(CategoryValidation.updateCategoryZodSchema),
   CategoryController.updateCategory
 );

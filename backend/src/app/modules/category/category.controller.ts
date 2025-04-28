@@ -67,7 +67,22 @@ const getAllCategories = catchAsync(async (req: Request, res: Response) => {
 
 const updateCategory = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await CategoryService.updateCategory(id, req.body);
+
+  const { ...categoryData } = req.body;
+  const existingCategory = await Category.findById(id);
+  if (!existingCategory) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Category not found");
+  }
+
+  if (req.file) {
+    if (existingCategory.image) {
+      const oldFilename = existingCategory.image.split("/").pop();
+      deleteFile(oldFilename ?? "");
+    }
+    categoryData.image = getFileUrl(req.file.filename);
+  }
+
+  const result = await CategoryService.updateCategory(id, categoryData);
 
   sendResponse<ICategory>(res, {
     statusCode: httpStatus.OK,
