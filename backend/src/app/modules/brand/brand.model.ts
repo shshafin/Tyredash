@@ -11,8 +11,7 @@ const BrandSchema = new Schema<IBrand, IBrandModel>(
     },
     description: {
       type: String,
-      required: true,
-      trim: true,
+      default: null,
     },
     logo: {
       type: String,

@@ -94,6 +94,17 @@ const updateCategory = catchAsync(async (req: Request, res: Response) => {
 
 const deleteCategory = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
+
+  const category = await CategoryService.getSingleCategory(id);
+  if (!category) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Make not found");
+  }
+
+  if (category.image) {
+    const filename = category.image.split("/").pop();
+    deleteFile(filename ?? "");
+  }
+
   const result = await CategoryService.deleteCategory(id);
 
   sendResponse<ICategory>(res, {

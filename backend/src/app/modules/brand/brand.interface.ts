@@ -2,7 +2,7 @@ import { Model } from "mongoose";
 
 export interface IBrand extends Document {
   name: string;
-  description: string;
+  description?: string;
   logo?: string;
 }
 
