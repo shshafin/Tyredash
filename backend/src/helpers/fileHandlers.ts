@@ -77,6 +77,21 @@ export const deleteFile = (filename: string) => {
   return false;
 };
 
+// export const deleteFile = async (filename: string): Promise<boolean> => {
+//   const filePath = path.join(__dirname, "../../public/storage", filename);
+
+//   try {
+//     await fs.promises.unlink(filePath);
+//     return true;
+//   } catch (error) {
+//     if (error.code === 'ENOENT') {
+//       // File doesn't exist
+//       return false;
+//     }
+//     throw error; // Re-throw other errors
+//   }
+// };
+
 export const handleUploadError = (
   err: Error,
   req: Request,

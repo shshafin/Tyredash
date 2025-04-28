@@ -74,7 +74,7 @@ const updateTire = catchAsync(async (req: Request, res: Response) => {
         existingTire.images.map(async (imageUrl) => {
           const filename = imageUrl.split("/").pop();
           if (filename) {
-            await deleteFile(filename);
+            deleteFile(filename);
           }
         })
       );
@@ -97,9 +97,34 @@ const updateTire = catchAsync(async (req: Request, res: Response) => {
 
 const deleteTire = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await TireService.deleteTire(id);
+  const tire = await Tire.findById(id);
 
-  sendResponse<ITire>(res, {
+  if (!tire) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Tire not found");
+  }
+
+  if (tire.images?.length) {
+    const deletionResults = await Promise.allSettled(
+      tire.images.map(async (imageUrl) => {
+        const filename = imageUrl.split("/").pop();
+        if (filename) {
+          await deleteFile(filename);
+        }
+      })
+    );
+
+    deletionResults.forEach((result, index) => {
+      if (result.status === "rejected") {
+        console.error(
+          `Failed to delete image ${tire.images?.[index]}:`,
+          result.reason
+        );
+      }
+    });
+  }
+
+  const result = await TireService.deleteTire(id);
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Tire deleted successfully",
