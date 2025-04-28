@@ -18,7 +18,7 @@ const router = express.Router();
 router.post(
   "/create",
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  uploadImages, // Add this middleware before validation
+  uploadImages,
   validateRequest(TireValidation.createTireZodSchema),
   TireController.createTire
 );
@@ -29,6 +29,7 @@ router.get("/:id", TireController.getSingleTire);
 router.patch(
   "/:id",
   auth(ENUM_USER_ROLE.ADMIN),
+  uploadImages,
   validateRequest(TireValidation.updateTireZodSchema),
   TireController.updateTire
 );

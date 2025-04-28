@@ -7,7 +7,9 @@ import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
 import { tireFilterableFields } from "./tire.constants";
 import { ITire } from "./tire.interface";
-import { getFileUrl } from "../../../helpers/fileHandlers";
+import { deleteFile, getFileUrl } from "../../../helpers/fileHandlers";
+import ApiError from "../../../errors/ApiError";
+import { Tire } from "./tire.model";
 
 const createTire = catchAsync(async (req: Request, res: Response) => {
   const { ...tireData } = req.body;
@@ -59,7 +61,30 @@ const getSingleTire = catchAsync(async (req: Request, res: Response) => {
 
 const updateTire = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const updatedData = req.body;
+  const { ...updatedData } = req.body;
+
+  const existingTire = await Tire.findById(id);
+  if (!existingTire) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Tire not found");
+  }
+
+  if (req.files) {
+    if (existingTire.images && existingTire.images.length > 0) {
+      await Promise.all(
+        existingTire.images.map(async (imageUrl) => {
+          const filename = imageUrl.split("/").pop();
+          if (filename) {
+            await deleteFile(filename);
+          }
+        })
+      );
+    }
+    const newImages = (req.files as Express.Multer.File[]).map((file) =>
+      getFileUrl(file.filename)
+    );
+    updatedData.images = newImages;
+  }
+
   const result = await TireService.updateTire(id, updatedData);
 
   sendResponse<ITire>(res, {
