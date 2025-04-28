@@ -7,9 +7,19 @@ import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
 import { tireFilterableFields } from "./tire.constants";
 import { ITire } from "./tire.interface";
+import { getFileUrl } from "../../../helpers/fileHandlers";
 
 const createTire = catchAsync(async (req: Request, res: Response) => {
   const { ...tireData } = req.body;
+
+  // Handle image uploads if they exist
+  if (req.files) {
+    const images = (req.files as Express.Multer.File[]).map((file) =>
+      getFileUrl(file.filename)
+    );
+    tireData.images = images;
+  }
+
   const result = await TireService.createTire(tireData);
 
   sendResponse<ITire>(res, {

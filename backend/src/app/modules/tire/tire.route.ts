@@ -4,12 +4,21 @@ import { TireController } from "./tire.controller";
 import { TireValidation } from "./tire.validation";
 import auth from "../../middlewares/auth";
 import { ENUM_USER_ROLE } from "../../../enum/user";
+import { handleUploadError, uploadImages } from "../../../helpers/fileHandlers";
 
 const router = express.Router();
 
+// router.post(
+//   "/",
+//   auth(ENUM_USER_ROLE.ADMIN),
+//   validateRequest(TireValidation.createTireZodSchema),
+//   TireController.createTire
+// );
+
 router.post(
-  "/",
-  auth(ENUM_USER_ROLE.ADMIN),
+  "/create",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  uploadImages, // Add this middleware before validation
   validateRequest(TireValidation.createTireZodSchema),
   TireController.createTire
 );
