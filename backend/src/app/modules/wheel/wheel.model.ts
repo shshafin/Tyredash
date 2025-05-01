@@ -20,7 +20,7 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
     },
     model: {
       type: Schema.Types.ObjectId,
-      ref: "Model",
+      ref: "CarModel",
       required: true,
     },
     trim: {

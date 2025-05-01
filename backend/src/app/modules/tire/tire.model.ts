@@ -20,7 +20,7 @@ const TireSchema = new Schema<ITire, ITireModel>(
     },
     model: {
       type: Schema.Types.ObjectId,
-      ref: "Model",
+      ref: "CarModel",
       required: true,
     },
     trim: {
@@ -51,8 +51,7 @@ const TireSchema = new Schema<ITire, ITireModel>(
       default: [],
     },
     productLine: {
-      type: [String],
-      default: [],
+      type: String,
     },
     unitName: {
       type: String,

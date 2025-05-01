@@ -50,7 +50,7 @@ export const uploadImages = multer({
   storage: storage,
   fileFilter: imageFilter,
   limits: { fileSize: 5 * 1024 * 1024, files: 10 },
-}).array("files", 10);
+}).array("images", 10);
 
 export const uploadFile = multer({
   storage: storage,

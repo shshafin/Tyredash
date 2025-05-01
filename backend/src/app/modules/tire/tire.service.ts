@@ -60,7 +60,13 @@ const getAllTires = async (
     andConditions.length > 0 ? { $and: andConditions } : {};
 
   const result = await Tire.find(whereConditions)
-    .populate("year make model trim tireSize brand category")
+    .populate("year")
+    .populate("make")
+    .populate("model")
+    .populate("trim")
+    .populate("tireSize")
+    .populate("brand")
+    .populate("category")
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
@@ -98,7 +104,15 @@ const updateTire = async (
 
   const result = await Tire.findOneAndUpdate({ _id: id }, payload, {
     new: true,
-  }).populate("year make model trim tireSize brand");
+  })
+    .populate("year")
+    .populate("make")
+    .populate("model")
+    .populate("trim")
+    .populate("tireSize")
+    .populate("brand")
+    .populate("category");
+
   return result;
 };
 

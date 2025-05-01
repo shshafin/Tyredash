@@ -60,14 +60,13 @@ const getAllWheels = async (
     andConditions.length > 0 ? { $and: andConditions } : {};
 
   const result = await Wheel.find(whereConditions)
-    .populate([
-      { path: "year", select: "year" },
-      { path: "make", select: "name" },
-      { path: "model", select: "name" },
-      { path: "trim", select: "name" },
-      { path: "tireSize", select: "size" },
-      { path: "brand", select: "name" },
-    ])
+    .populate("year")
+    .populate("make")
+    .populate("model")
+    .populate("trim")
+    .populate("tireSize")
+    .populate("brand")
+    .populate("category")
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);

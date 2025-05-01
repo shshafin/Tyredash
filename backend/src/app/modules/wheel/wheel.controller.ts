@@ -12,16 +12,23 @@ import ApiError from "../../../errors/ApiError";
 import { Wheel } from "./wheel.model";
 
 const createWheel = catchAsync(async (req: Request, res: Response) => {
-  const { ...wheelData } = req.body;
+  let { data } = req.body;
+
+  if (!data) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Data is required");
+  }
+  if (typeof data === "string") {
+    data = JSON.parse(data);
+  }
 
   if (req.files) {
     const images = (req.files as Express.Multer.File[]).map((file) =>
       getFileUrl(file.filename)
     );
-    wheelData.images = images;
+    data.images = images;
   }
 
-  const result = await WheelService.createWheel(wheelData);
+  const result = await WheelService.createWheel(data);
 
   sendResponse<IWheel>(res, {
     statusCode: httpStatus.OK,
@@ -60,7 +67,11 @@ const getSingleWheel = catchAsync(async (req: Request, res: Response) => {
 
 const updateWheel = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { ...updatedData } = req.body;
+  let { data } = req.body;
+
+  if (typeof data === "string") {
+    data = JSON.parse(data);
+  }
 
   const existingWheel = await Wheel.findById(id);
   if (!existingWheel) {
@@ -81,10 +92,10 @@ const updateWheel = catchAsync(async (req: Request, res: Response) => {
     const newImages = (req.files as Express.Multer.File[]).map((file) =>
       getFileUrl(file.filename)
     );
-    updatedData.images = newImages;
+    data.images = newImages;
   }
 
-  const result = await WheelService.updateWheel(id, updatedData);
+  const result = await WheelService.updateWheel(id, data);
 
   sendResponse<IWheel>(res, {
     statusCode: httpStatus.OK,
@@ -108,7 +119,7 @@ const deleteWheel = catchAsync(async (req: Request, res: Response) => {
       wheel.images.map(async (imageUrl) => {
         const filename = imageUrl.split("/").pop();
         if (filename) {
-          await deleteFile(filename);
+          deleteFile(filename);
         }
       })
     );

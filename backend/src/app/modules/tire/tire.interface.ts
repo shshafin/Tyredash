@@ -11,7 +11,7 @@ export interface ITire {
   category: Types.ObjectId;
   description: string;
   images: string[];
-  productLine: string[];
+  productLine: string;
   unitName: string;
   conditionInfo: string;
   grossWeightRange: string;

@@ -12,17 +12,20 @@ import ApiError from "../../../errors/ApiError";
 import { Tire } from "./tire.model";
 
 const createTire = catchAsync(async (req: Request, res: Response) => {
-  const { ...tireData } = req.body;
+  let { data } = req.body;
 
-  // Handle image uploads if they exist
+  if (typeof data === "string") {
+    data = JSON.parse(data);
+  }
+
   if (req.files) {
     const images = (req.files as Express.Multer.File[]).map((file) =>
       getFileUrl(file.filename)
     );
-    tireData.images = images;
+    data.images = images;
   }
 
-  const result = await TireService.createTire(tireData);
+  const result = await TireService.createTire(data);
 
   sendResponse<ITire>(res, {
     statusCode: httpStatus.OK,
@@ -61,7 +64,12 @@ const getSingleTire = catchAsync(async (req: Request, res: Response) => {
 
 const updateTire = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { ...updatedData } = req.body;
+
+  let { updatedData } = req.body;
+
+  if (typeof updatedData === "string") {
+    updatedData = JSON.parse(updatedData);
+  }
 
   const existingTire = await Tire.findById(id);
   if (!existingTire) {
@@ -108,7 +116,7 @@ const deleteTire = catchAsync(async (req: Request, res: Response) => {
       tire.images.map(async (imageUrl) => {
         const filename = imageUrl.split("/").pop();
         if (filename) {
-          await deleteFile(filename);
+          deleteFile(filename);
         }
       })
     );
