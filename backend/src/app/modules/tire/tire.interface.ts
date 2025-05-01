@@ -63,6 +63,8 @@ export interface ITireFilters {
   make?: string;
   model?: string;
   year?: string;
+  trim?: string;
+  tireSize?: string;
   price?: number;
   stockQuantity?: number;
   constructionType?: string;

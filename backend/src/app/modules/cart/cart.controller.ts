@@ -6,7 +6,7 @@ import { ICart } from "./cart.interface";
 import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
 import { cartFilterableFields } from "./cart.constants";
-import { CartService } from "./car.service";
+import { CartService } from "./cart.service";
 
 const createCart = catchAsync(async (req: Request, res: Response) => {
   const { ...cartData } = req.body;

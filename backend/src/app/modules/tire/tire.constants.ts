@@ -8,6 +8,8 @@ export const tireFilterableFields = [
   "make",
   "model",
   "year",
+  "trim",
+  "tireSize",
   "price",
   "stockQuantity",
   "constructionType",

@@ -4,7 +4,7 @@ import httpStatus from "http-status";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
-import { SortOrder } from "mongoose";
+import { SortOrder, Types } from "mongoose";
 import { ITire, ITireFilters } from "./tire.interface";
 import { tireSearchableFields } from "./tire.constants";
 
@@ -37,6 +37,21 @@ const getAllTires = async (
   if (Object.keys(filtersData).length) {
     andConditions.push({
       $and: Object.entries(filtersData).map(([field, value]) => {
+        // Handle ObjectId fields
+        if (
+          [
+            "year",
+            "make",
+            "model",
+            "trim",
+            "tireSize",
+            "brand",
+            "category",
+          ].includes(field)
+        ) {
+          return { [field]: new Types.ObjectId(String(value)) };
+        }
+        // Handle numeric fields
         if (
           field === "price" ||
           field === "stockQuantity" ||
@@ -46,11 +61,13 @@ const getAllTires = async (
         ) {
           return { [field]: Number(value) };
         }
+        // Handle other fields
         return { [field]: value };
       }),
     });
   }
 
+  // Rest of your code remains the same...
   const sortConditions: { [key: string]: SortOrder } = {};
   if (sortBy && sortOrder) {
     sortConditions[sortBy] = sortOrder;
@@ -82,7 +99,6 @@ const getAllTires = async (
     data: result,
   };
 };
-
 const getSingleTire = async (id: string): Promise<ITire | null> => {
   const result = await Tire.findById(id).populate(
     "year make model trim tireSize brand"

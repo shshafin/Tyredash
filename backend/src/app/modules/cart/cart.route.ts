@@ -4,7 +4,7 @@ import { CartController } from "./cart.controller";
 
 import auth from "../../middlewares/auth";
 import { ENUM_USER_ROLE } from "../../../enum/user";
-import { CartValidation } from "./car.validation";
+import { CartValidation } from "./cart.validation";
 
 const router = express.Router();
 
