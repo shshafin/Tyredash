@@ -9,6 +9,8 @@ export const wheelFilterableFields = [
   "make",
   "model",
   "year",
+  "trim",
+  "tireSize",
   "price",
   "stockQuantity",
   "constructionType",

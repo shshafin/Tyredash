@@ -6,10 +6,11 @@ import { WheelService } from "./wheel.service";
 import { IWheel } from "./wheel.interface";
 import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
-import { wheelFilterableFields } from "./whell.constants";
+
 import { deleteFile, getFileUrl } from "../../../helpers/fileHandlers";
 import ApiError from "../../../errors/ApiError";
 import { Wheel } from "./wheel.model";
+import { wheelFilterableFields } from "./wheel.constants";
 
 const createWheel = catchAsync(async (req: Request, res: Response) => {
   let { data } = req.body;

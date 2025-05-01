@@ -8,6 +8,7 @@ import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { SortOrder } from "mongoose";
 import { IWheelFilters } from "./wheel.interface";
 import { Types } from "mongoose";
+import { wheelSearchableFields } from "./wheel.constants";
 
 const createWheel = async (wheelData: IWheel): Promise<IWheel> => {
   const result = await Wheel.create(wheelData);
@@ -26,31 +27,54 @@ const getAllWheels = async (
 
   if (searchTerm) {
     andConditions.push({
-      $or: ["name", "boltPattern", "wheelType", "category", "finish"].map(
-        (field) => ({
-          [field]: {
-            $regex: searchTerm,
-            $options: "i",
-          },
-        })
-      ),
+      $or: wheelSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
     });
   }
 
   if (Object.keys(filtersData).length) {
-    const filterConditions = Object.entries(filtersData).map(
-      ([field, value]) => {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => {
         if (
-          ["year", "make", "model", "trim", "tireSize", "brand"].includes(field)
+          [
+            "year",
+            "make",
+            "model",
+            "trim",
+            "tireSize",
+            "brand",
+            "category",
+          ].includes(field)
         ) {
-          return { [field]: new Types.ObjectId(value) };
+          if (!Types.ObjectId.isValid(String(value))) {
+            throw new ApiError(httpStatus.BAD_REQUEST, `Invalid ${field} ID`);
+          }
+          return { [field]: new Types.ObjectId(String(value)) };
         }
+
+        if (
+          field === "price" ||
+          field === "stockQuantity" ||
+          field === "RimDiameter" ||
+          field === "RimWidth" ||
+          field === "offset" ||
+          field === "hubBoreSize" ||
+          field === "numberOFBolts" ||
+          field === "loadCapacity"
+        ) {
+          return { [field]: Number(value) };
+        }
+
         return { [field]: value };
-      }
-    );
-    andConditions.push({ $and: filterConditions });
+      }),
+    });
   }
 
+  // Sorting
   const sortConditions: { [key: string]: SortOrder } = {};
   if (sortBy && sortOrder) {
     sortConditions[sortBy] = sortOrder;
@@ -59,6 +83,7 @@ const getAllWheels = async (
   const whereConditions =
     andConditions.length > 0 ? { $and: andConditions } : {};
 
+  // Database query
   const result = await Wheel.find(whereConditions)
     .populate("year")
     .populate("make")
@@ -82,7 +107,6 @@ const getAllWheels = async (
     data: result,
   };
 };
-
 const getSingleWheel = async (id: string): Promise<IWheel | null> => {
   const result = await Wheel.findById(id).populate([
     { path: "year", select: "year" },
