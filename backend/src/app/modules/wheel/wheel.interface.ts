@@ -7,6 +7,7 @@ export interface IWheel {
   model: Types.ObjectId;
   trim: Types.ObjectId;
   tireSize: Types.ObjectId;
+  drivingType: Types.ObjectId;
   brand: Types.ObjectId;
   description: string;
   images: string[];

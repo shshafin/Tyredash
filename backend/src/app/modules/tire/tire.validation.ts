@@ -22,6 +22,10 @@ const createTireZodSchema = z.object({
     tireSize: z.string({
       required_error: "Tire size is required",
     }),
+    drivingType: z.string({
+      required_error: "driving type is required",
+    }),
+
     brand: z.string({
       required_error: "Brand is required",
     }),

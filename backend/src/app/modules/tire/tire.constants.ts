@@ -10,6 +10,7 @@ export const tireFilterableFields = [
   "year",
   "trim",
   "tireSize",
+  "drivingType",
   "price",
   "stockQuantity",
   "constructionType",

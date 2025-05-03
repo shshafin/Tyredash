@@ -33,6 +33,11 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
       ref: "TireSize",
       required: true,
     },
+    drivingType: {
+      type: Schema.Types.ObjectId,
+      ref: "DrivingType",
+      required: true,
+    },
     brand: {
       type: Schema.Types.ObjectId,
       ref: "Brand",

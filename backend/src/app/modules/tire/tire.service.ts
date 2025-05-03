@@ -45,6 +45,7 @@ const getAllTires = async (
             "model",
             "trim",
             "tireSize",
+            "drivingType",
             "brand",
             "category",
           ].includes(field)
@@ -82,6 +83,7 @@ const getAllTires = async (
     .populate("model")
     .populate("trim")
     .populate("tireSize")
+    .populate("drivingType")
     .populate("brand")
     .populate("category")
     .sort(sortConditions)
@@ -126,6 +128,7 @@ const updateTire = async (
     .populate("model")
     .populate("trim")
     .populate("tireSize")
+    .populate("drivingType")
     .populate("brand")
     .populate("category");
 

@@ -7,6 +7,7 @@ export interface ITire {
   model: Types.ObjectId;
   trim: Types.ObjectId;
   tireSize: Types.ObjectId;
+  drivingType: Types.ObjectId;
   brand: Types.ObjectId;
   category: Types.ObjectId;
   description: string;

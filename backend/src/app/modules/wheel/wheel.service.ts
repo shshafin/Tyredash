@@ -46,6 +46,7 @@ const getAllWheels = async (
             "model",
             "trim",
             "tireSize",
+            "drivingType",
             "brand",
             "category",
           ].includes(field)
@@ -90,6 +91,7 @@ const getAllWheels = async (
     .populate("model")
     .populate("trim")
     .populate("tireSize")
+    .populate("drivingType")
     .populate("brand")
     .populate("category")
     .sort(sortConditions)
@@ -114,6 +116,7 @@ const getSingleWheel = async (id: string): Promise<IWheel | null> => {
     { path: "model", select: "name" },
     { path: "trim", select: "name" },
     { path: "tireSize", select: "size" },
+    { path: "drivingType", select: "title" },
     { path: "brand", select: "name" },
   ]);
   if (!result) {
@@ -139,6 +142,7 @@ const updateWheel = async (
     { path: "model", select: "name" },
     { path: "trim", select: "name" },
     { path: "tireSize", select: "size" },
+    { path: "drivingType", select: "title" },
     { path: "brand", select: "name" },
   ]);
   return result;

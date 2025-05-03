@@ -2,9 +2,11 @@ import { z } from "zod";
 
 const createWheelZodSchema = z.object({
   body: z.object({
-    name: z.string({
-      required_error: "Name is required",
-    }).trim(),
+    name: z
+      .string({
+        required_error: "Name is required",
+      })
+      .trim(),
     year: z.string({
       required_error: "Year is required",
     }),
@@ -19,6 +21,9 @@ const createWheelZodSchema = z.object({
     }),
     tireSize: z.string({
       required_error: "Tire size is required",
+    }),
+    drivingType: z.string({
+      required_error: "Driving type is required",
     }),
     brand: z.string({
       required_error: "Brand is required",
