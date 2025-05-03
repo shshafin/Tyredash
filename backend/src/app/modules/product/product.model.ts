@@ -8,11 +8,6 @@ const ProductSchema = new Schema<IProduct, IProductModel>(
       required: true,
       trim: true,
     },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     description: {
       type: String,
       required: true,
@@ -21,10 +16,10 @@ const ProductSchema = new Schema<IProduct, IProductModel>(
       type: Number,
       required: true,
     },
-    salePrice: {
+    discountPrice: {
       type: Number,
     },
-    stock: {
+    stockQuantity: {
       type: Number,
       required: true,
     },
@@ -42,28 +37,9 @@ const ProductSchema = new Schema<IProduct, IProductModel>(
       ref: "Category",
       required: true,
     },
-    compatibleVehicles: [
-      {
-        year: { type: Schema.Types.ObjectId, ref: "Year" },
-        make: { type: Schema.Types.ObjectId, ref: "Make" },
-        model: { type: Schema.Types.ObjectId, ref: "CarModel" },
-        trim: { type: Schema.Types.ObjectId, ref: "Trim" },
-      },
-    ],
     brand: {
       type: Schema.Types.ObjectId,
       ref: "Brand",
-    },
-    ratings: [
-      {
-        userId: { type: Schema.Types.ObjectId, ref: "User" },
-        value: { type: Number, required: true },
-        review: { type: String },
-      },
-    ],
-    averageRating: {
-      type: Number,
-      default: 0,
     },
   },
   {

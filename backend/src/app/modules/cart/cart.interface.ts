@@ -1,16 +1,21 @@
-import { Document, Model, Types } from "mongoose";
+import { Model, Types } from "mongoose";
 
-export type CartItem = {
+export type ProductType = "tire" | "wheel" | "product";
+
+export interface CartItem {
   product: Types.ObjectId;
-  productType: "tire" | "wheel";
+  productType: ProductType;
   quantity: number;
   price: number;
-};
+  name: string;
+  thumbnail?: string;
+}
 
-export interface ICart extends Document {
+export interface ICart {
   user: Types.ObjectId;
   items: CartItem[];
   totalPrice: number;
+  totalItems: number;
 }
 
 export type ICartModel = Model<ICart, Record<string, unknown>>;

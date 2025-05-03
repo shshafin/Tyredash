@@ -16,7 +16,12 @@ const reviewSchema = new Schema<IReview, IReviewModel>(
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+  }
 );
 
 export const Review = model<IReview, IReviewModel>("Review", reviewSchema);

@@ -7,10 +7,19 @@ import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
 import { cartFilterableFields } from "./cart.constants";
 import { CartService } from "./cart.service";
+import { Types } from "mongoose";
+import ApiError from "../../../errors/ApiError";
 
 const createCart = catchAsync(async (req: Request, res: Response) => {
-  const { ...cartData } = req.body;
-  const result = await CartService.createCart(cartData);
+  const { userId } = req.body;
+
+  if (typeof userId !== "string") {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User ID must be a string");
+  }
+  const userIdString: string = userId;
+  const objectId = new Types.ObjectId(userIdString);
+
+  const result = await CartService.createCart(objectId);
 
   sendResponse<ICart>(res, {
     statusCode: httpStatus.OK,
@@ -49,8 +58,14 @@ const getCartByUserId = catchAsync(async (req: Request, res: Response) => {
 
 const addItemToCart = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params;
-  const item = req.body;
-  const result = await CartService.addItemToCart(userId, item);
+  const { productId, productType, quantity = 1 } = req.body;
+
+  const result = await CartService.addItemToCart(
+    userId,
+    productId,
+    productType,
+    quantity
+  );
 
   sendResponse<ICart>(res, {
     statusCode: httpStatus.OK,
@@ -60,28 +75,34 @@ const addItemToCart = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updateCartItemQuantity = catchAsync(
-  async (req: Request, res: Response) => {
-    const { userId, productId } = req.params;
-    const { quantity } = req.body;
-    const result = await CartService.updateCartItemQuantity(
-      userId,
-      productId,
-      quantity
-    );
+const updateItemQuantity = catchAsync(async (req: Request, res: Response) => {
+  const { userId, productId } = req.params;
+  const { productType, quantity } = req.body;
 
-    sendResponse<ICart>(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Cart item quantity updated successfully",
-      data: result,
-    });
-  }
-);
+  const result = await CartService.updateItemQuantity(
+    userId,
+    productId,
+    productType,
+    quantity
+  );
+
+  sendResponse<ICart>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Cart item quantity updated successfully",
+    data: result,
+  });
+});
 
 const removeItemFromCart = catchAsync(async (req: Request, res: Response) => {
   const { userId, productId } = req.params;
-  const result = await CartService.removeItemFromCart(userId, productId);
+  const { productType } = req.body;
+
+  const result = await CartService.removeItemFromCart(
+    userId,
+    productId,
+    productType
+  );
 
   sendResponse<ICart>(res, {
     statusCode: httpStatus.OK,
@@ -108,7 +129,7 @@ export const CartController = {
   getAllCarts,
   getCartByUserId,
   addItemToCart,
-  updateCartItemQuantity,
+  updateItemQuantity,
   removeItemFromCart,
   clearCart,
 };
