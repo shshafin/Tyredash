@@ -110,15 +110,9 @@ const getAllWheels = async (
   };
 };
 const getSingleWheel = async (id: string): Promise<IWheel | null> => {
-  const result = await Wheel.findById(id).populate([
-    { path: "year", select: "year" },
-    { path: "make", select: "name" },
-    { path: "model", select: "name" },
-    { path: "trim", select: "name" },
-    { path: "tireSize", select: "size" },
-    { path: "drivingType", select: "title" },
-    { path: "brand", select: "name" },
-  ]);
+  const result = await Wheel.findById(id).populate(
+    "year make model trim tireSize brand category drivingType"
+  );
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "Wheel not found");
   }

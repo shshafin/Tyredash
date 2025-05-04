@@ -22,9 +22,9 @@ const auth =
       req.user = verifiedUser; // role  , userid
 
       // user guard with role and user ID
-      if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
-        throw new ApiError(httpStatus.FORBIDDEN, "Forbidden");
-      }
+      // if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
+      //   throw new ApiError(httpStatus.FORBIDDEN, "Forbidden");
+      // }
       next();
     } catch (error) {
       next(error);

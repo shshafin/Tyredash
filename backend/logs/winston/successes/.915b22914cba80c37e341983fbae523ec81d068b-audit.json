@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\Full-Stack-Development\\marceline-projects\\Tyredash-Server-main\\backend\\logs\\winston\\successes\\.915b22914cba80c37e341983fbae523ec81d068b-audit.json",
+    "files": [
+        {
+            "date": 1746333358230,
+            "name": "C:\\Users\\Full-Stack-Development\\marceline-projects\\Tyredash-Server-main\\backend\\logs\\winston\\successes\\tyredash-2025-04-05-10-success.log",
+            "hash": "1a8ef6df4ff3244ac92ba2f5103175277fb9b27ccabe5dd91d34af856ddaeedf"
+        },
+        {
+            "date": 1746334800661,
+            "name": "C:\\Users\\Full-Stack-Development\\marceline-projects\\Tyredash-Server-main\\backend\\logs\\winston\\successes\\tyredash-2025-04-05-11-success.log",
+            "hash": "0ab11d64dfd9f38f471c28154465dced9be5cc7a167b2ddc082cdfd174f8d01c"
+        }
+    ],
+    "hashType": "sha256"
+}

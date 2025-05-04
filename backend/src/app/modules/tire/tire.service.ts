@@ -103,7 +103,7 @@ const getAllTires = async (
 };
 const getSingleTire = async (id: string): Promise<ITire | null> => {
   const result = await Tire.findById(id).populate(
-    "year make model trim tireSize brand"
+    "year make model trim tireSize brand category drivingType"
   );
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "Tire not found");

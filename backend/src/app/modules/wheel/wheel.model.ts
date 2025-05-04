@@ -8,6 +8,11 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
       required: true,
       trim: true,
     },
+    drivingType: {
+      type: Schema.Types.ObjectId,
+      ref: "DrivingType",
+      required: true,
+    },
     year: {
       type: Schema.Types.ObjectId,
       ref: "Year",
@@ -31,11 +36,6 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
     tireSize: {
       type: Schema.Types.ObjectId,
       ref: "TireSize",
-      required: true,
-    },
-    drivingType: {
-      type: Schema.Types.ObjectId,
-      ref: "DrivingType",
       required: true,
     },
     brand: {
@@ -145,10 +145,7 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
       type: String,
       required: true,
     },
-    wheelStockQuantity: {
-      type: Number,
-      required: true,
-    },
+
     price: {
       type: Number,
       required: true,
