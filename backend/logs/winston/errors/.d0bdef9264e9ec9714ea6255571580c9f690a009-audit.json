@@ -1,0 +1,35 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\Full-Stack-Development\\marceline-projects\\Tyredash-Server-main\\backend\\logs\\winston\\errors\\.d0bdef9264e9ec9714ea6255571580c9f690a009-audit.json",
+    "files": [
+        {
+            "date": 1746333358234,
+            "name": "C:\\Users\\Full-Stack-Development\\marceline-projects\\Tyredash-Server-main\\backend\\logs\\winston\\errors\\tyredash-2025-04-05-10-error.log",
+            "hash": "b1ed937faef3cb6f3facecea230330dfb97f030aba81f3ef321c9ce223f9d742"
+        },
+        {
+            "date": 1746334800665,
+            "name": "C:\\Users\\Full-Stack-Development\\marceline-projects\\Tyredash-Server-main\\backend\\logs\\winston\\errors\\tyredash-2025-04-05-11-error.log",
+            "hash": "fd702fd66460a9d209fef3f9d1d44c9b820374ce863c897d81b72cfb214962fd"
+        },
+        {
+            "date": 1746340450430,
+            "name": "C:\\Users\\Full-Stack-Development\\marceline-projects\\Tyredash-Server-main\\backend\\logs\\winston\\errors\\tyredash-2025-04-05-12-error.log",
+            "hash": "08429ee0b0b99c12167ceba1d532a21ecfe9c4450ec516bb22d8d9206cb8d0aa"
+        },
+        {
+            "date": 1746346172214,
+            "name": "C:\\Users\\Full-Stack-Development\\marceline-projects\\Tyredash-Server-main\\backend\\logs\\winston\\errors\\tyredash-2025-04-05-14-error.log",
+            "hash": "d5b6d494bdcada15b9d04a452a4d1009153b3876dec437c1bb74cf0b29c4d91e"
+        },
+        {
+            "date": 1746373197135,
+            "name": "C:\\Users\\Full-Stack-Development\\marceline-projects\\Tyredash-Server-main\\backend\\logs\\winston\\errors\\tyredash-2025-04-05-21-error.log",
+            "hash": "d7691617b475168bb9780f9ee558862c683c45e5cdf7bc6ed42faf111fc80dec"
+        }
+    ],
+    "hashType": "sha256"
+}

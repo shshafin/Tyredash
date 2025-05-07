@@ -15,9 +15,6 @@ import { wheelFilterableFields } from "./wheel.constants";
 const createWheel = catchAsync(async (req: Request, res: Response) => {
   let { data } = req.body;
 
-  if (!data) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Data is required");
-  }
   if (typeof data === "string") {
     data = JSON.parse(data);
   }
