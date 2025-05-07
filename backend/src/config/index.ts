@@ -20,4 +20,16 @@ export default {
   resetlink: process.env.RESET_PASSWORD_UI_LINK,
   email: process.env.EMAIL,
   appPass: process.env.APP_PASSWORD,
+
+  stripe: {
+    secret_key: process.env.STRIPE_SECRET_KEY,
+    publishable_key: process.env.STRIPE_PUBLISHABLE_KEY,
+    webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
+  },
+  paypal: {
+    client_id: process.env.PAYPAL_CLIENT_ID,
+    secret: process.env.PAYPAL_SECRET,
+    base_url: process.env.PAYPAL_BASE_URL || "https://api-m.sandbox.paypal.com",
+  },
+  frontend_url: process.env.FRONTEND_URL,
 };

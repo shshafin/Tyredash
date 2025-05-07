@@ -1,25 +1,44 @@
 import { Document, Model, Types } from "mongoose";
+import { ICart } from "../cart/cart.interface";
 
-export enum PaymentMethod {
-  PAYPAL = "paypal",
-  CREDIT_CARD = "credit_card",
-}
+export type PaymentMethod =
+  | "paypal"
+  | "stripe"
+  | "cash_on_delivery"
+  | "bank_transfer"
+  | "credit_card"
+  | "debit_card";
 
-export enum PaymentStatus {
-  PENDING = "pending",
-  COMPLETED = "completed",
-  FAILED = "failed",
-  REFUNDED = "refunded",
-}
+export type PaymentStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed"
+  | "refunded"
+  | "cancelled";
 
-export interface IPayment extends Document {
-  order: Types.ObjectId;
+export interface IPayment {
   user: Types.ObjectId;
-  paymentMethod: PaymentMethod;
+  cart: Types.ObjectId | ICart;
   amount: number;
-  status: PaymentStatus;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
   transactionId?: string;
-  paymentDetails?: any;
+  paymentDetails?: any; // For storing gateway-specific details
+  billingAddress?: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  shippingAddress?: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
 }
 
 export type IPaymentModel = Model<IPayment, Record<string, unknown>>;
