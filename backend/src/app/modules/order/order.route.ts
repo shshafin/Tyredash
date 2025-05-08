@@ -1,24 +1,30 @@
 import express from "express";
-import validateRequest from "../../middlewares/validateRequest";
 import { OrderController } from "./order.controller";
-import { OrderValidation } from "./order.validation";
 import auth from "../../middlewares/auth";
+import validateRequest from "../../middlewares/validateRequest";
+import { OrderValidation } from "./order.validation";
 import { ENUM_USER_ROLE } from "../../../enum/user";
 
 const router = express.Router();
 
 router.post(
   "/",
-  auth(),
+  auth(ENUM_USER_ROLE.USER),
   validateRequest(OrderValidation.createOrderZodSchema),
   OrderController.createOrder
 );
 
-router.get("/", auth(ENUM_USER_ROLE.ADMIN), OrderController.getAllOrders);
+router.get(
+  "/",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.USER),
+  OrderController.getAllOrders
+);
 
-router.get("/my-orders", auth(), OrderController.getMyOrders);
-
-router.get("/:id", auth(), OrderController.getOrderById);
+router.get(
+  "/:id",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.USER),
+  OrderController.getOrderById
+);
 
 router.patch(
   "/:id/status",
@@ -28,12 +34,9 @@ router.patch(
 );
 
 router.patch(
-  "/:id/payment-result",
-  auth(),
-  validateRequest(OrderValidation.updatePaymentResultZodSchema),
-  OrderController.updatePaymentResult
+  "/:id/cancel",
+  auth(ENUM_USER_ROLE.USER),
+  OrderController.cancelOrder
 );
-
-router.delete("/:id", auth(ENUM_USER_ROLE.ADMIN), OrderController.deleteOrder);
 
 export const OrderRoutes = router;

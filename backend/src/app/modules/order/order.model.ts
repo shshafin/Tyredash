@@ -1,58 +1,102 @@
 import { Schema, model } from "mongoose";
-import { IOrder, IOrderModel, OrderStatus } from "./order.interface";
+import { IOrder, IOrderModel } from "./order.interface";
 
 const orderSchema = new Schema<IOrder, IOrderModel>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    payment: {
+      type: Schema.Types.ObjectId,
+      ref: "Payment",
+      required: true,
+    },
     items: [
       {
-        product: { type: Schema.Types.ObjectId, required: true },
-        productType: { type: String, enum: ["tire", "wheel"], required: true },
-        quantity: { type: Number, required: true, min: 1 },
-        price: { type: Number, required: true },
+        product: {
+          type: Schema.Types.ObjectId,
+          required: true,
+          refPath: "items.productType",
+        },
+        productType: {
+          type: String,
+          enum: ["tire", "wheel", "product"],
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        thumbnail: {
+          type: String,
+        },
       },
     ],
+    totalPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    totalItems: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    status: {
+      type: String,
+      enum: [
+        "pending",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "refunded",
+      ],
+      default: "pending",
+    },
     shippingAddress: {
       street: { type: String, required: true },
       city: { type: String, required: true },
       state: { type: String, required: true },
       postalCode: { type: String, required: true },
-      country: { type: String, required: true, default: "USA" },
-      phone: { type: String, required: true },
+      country: { type: String, required: true },
     },
-    paymentMethod: {
+    billingAddress: {
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true },
+    },
+    trackingNumber: {
       type: String,
-      enum: ["paypal", "credit_card"],
-      required: true,
     },
-    paymentResult: {
-      id: String,
-      status: String,
-      update_time: String,
-      email_address: String,
+    estimatedDelivery: {
+      type: Date,
     },
-    itemsPrice: { type: Number, required: true, default: 0.0 },
-    taxPrice: { type: Number, required: true, default: 0.0 },
-    shippingPrice: { type: Number, required: true, default: 0.0 },
-    totalPrice: { type: Number, required: true, default: 0.0 },
-    status: {
-      type: String,
-      enum: Object.values(OrderStatus),
-      default: OrderStatus.PENDING,
-    },
-    paidAt: { type: Date },
-    deliveredAt: { type: Date },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+  }
 );
 
-orderSchema.pre("save", function (next) {
-  this.itemsPrice = this.items.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-  this.totalPrice = this.itemsPrice + this.taxPrice + this.shippingPrice;
-  next();
-});
+// Add index for frequently queried fields
+orderSchema.index({ user: 1 });
+orderSchema.index({ status: 1 });
+orderSchema.index({ createdAt: -1 });
 
 export const Order = model<IOrder, IOrderModel>("Order", orderSchema);

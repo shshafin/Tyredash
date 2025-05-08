@@ -9,6 +9,7 @@ import config from "../../../config";
 import { Tire } from "../tire/tire.model"; // Import the Tire model
 import { Wheel } from "../wheel/wheel.model";
 import { Product } from "../product/product.model";
+import { OrderService } from "../order/order.service";
 
 // Initialize PayPal and Stripe
 const stripe = require("stripe")(config.stripe.secret_key);
@@ -264,19 +265,40 @@ export const verifyPaypalPayment = async (
   }
 };
 
+// const handleSuccessfulPayment = async (payment: any) => {
+//   // 1. Create an order record (you'll need an Order model)
+//   // 2. Update product stock quantities
+//   // 3. Clear the user's cart
+//   const cart = await Cart.findById(payment.cart);
+
+//   if (cart) {
+//     // Update stock for each item in the cart
+//     for (const item of cart.items) {
+//       await updateProductStock(item.product, item.productType, item.quantity);
+//     }
+
+//     // Clear the cart
+//     await Cart.findByIdAndUpdate(payment.cart, {
+//       items: [],
+//       totalPrice: 0,
+//       totalItems: 0,
+//     });
+//   }
+// };
+
 const handleSuccessfulPayment = async (payment: any) => {
-  // 1. Create an order record (you'll need an Order model)
-  // 2. Update product stock quantities
-  // 3. Clear the user's cart
+  // 1. Update product stock quantities
   const cart = await Cart.findById(payment.cart);
 
   if (cart) {
-    // Update stock for each item in the cart
     for (const item of cart.items) {
       await updateProductStock(item.product, item.productType, item.quantity);
     }
 
-    // Clear the cart
+    // 2. Create an order
+    await OrderService.createOrderFromPayment(payment._id);
+
+    // 3. Clear the cart
     await Cart.findByIdAndUpdate(payment.cart, {
       items: [],
       totalPrice: 0,

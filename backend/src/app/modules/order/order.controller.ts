@@ -3,31 +3,39 @@ import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { OrderService } from "./order.service";
-import { IOrder } from "./order.interface";
+
+import ApiError from "../../../errors/ApiError";
 import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
 import { orderFilterableFields } from "./order.constants";
+import { ENUM_USER_ROLE } from "../../../enum/user";
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?._id;
-  const orderData = req.body;
-  const result = await OrderService.createOrder(userId, orderData);
+  const { paymentId } = req.body;
+  const order = await OrderService.createOrderFromPayment(paymentId);
 
-  sendResponse<IOrder>(res, {
+  sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
     message: "Order created successfully",
-    data: result,
+    data: order,
   });
 });
 
 const getAllOrders = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, orderFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
+  const userRole = req.user?.role;
+  const userId = req.user?._id;
 
-  const result = await OrderService.getAllOrders(filters, paginationOptions);
+  const result = await OrderService.getAllOrders(
+    filters,
+    paginationOptions,
+    userRole,
+    userId
+  );
 
-  sendResponse<IOrder[]>(res, {
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Orders retrieved successfully",
@@ -38,63 +46,54 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
 
 const getOrderById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await OrderService.getOrderById(id);
+  const userId = req.user?._id;
+  const userRole = req.user?.role;
 
-  sendResponse<IOrder>(res, {
+  const order = await OrderService.getOrderById(id, userId, userRole);
+
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Order retrieved successfully",
-    data: result,
-  });
-});
-
-const getMyOrders = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?._id;
-  const result = await OrderService.getUserOrders(userId);
-
-  sendResponse<IOrder[]>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "User orders retrieved successfully",
-    data: result,
+    data: order,
   });
 });
 
 const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { status } = req.body;
-  const result = await OrderService.updateOrderStatus(id, status);
+  const { status, trackingNumber, estimatedDelivery } = req.body;
 
-  sendResponse<IOrder>(res, {
+  // Only admin can update order status
+  if (req.user?.role !== ENUM_USER_ROLE.ADMIN) {
+    throw new ApiError(httpStatus.FORBIDDEN, "Forbidden");
+  }
+
+  const order = await OrderService.updateOrderStatus(
+    id,
+    status,
+    trackingNumber,
+    estimatedDelivery
+  );
+
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Order status updated successfully",
-    data: result,
+    data: order,
   });
 });
 
-const updatePaymentResult = catchAsync(async (req: Request, res: Response) => {
+const cancelOrder = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const paymentResult = req.body;
-  const result = await OrderService.updatePaymentResult(id, paymentResult);
+  const userId = req.user?._id;
 
-  sendResponse<IOrder>(res, {
+  const order = await OrderService.cancelOrder(id, userId);
+
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Payment result updated successfully",
-    data: result,
-  });
-});
-
-const deleteOrder = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await OrderService.deleteOrder(id);
-
-  sendResponse<IOrder>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Order deleted successfully",
-    data: result,
+    message: "Order cancelled successfully",
+    data: order,
   });
 });
 
@@ -102,8 +101,6 @@ export const OrderController = {
   createOrder,
   getAllOrders,
   getOrderById,
-  getMyOrders,
   updateOrderStatus,
-  updatePaymentResult,
-  deleteOrder,
+  cancelOrder,
 };
