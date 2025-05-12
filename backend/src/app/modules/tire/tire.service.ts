@@ -58,7 +58,9 @@ const getAllTires = async (
           field === "stockQuantity" ||
           field === "sectionWidth" ||
           field === "aspectRatio" ||
-          field === "rimDiameter"
+          field === "rimDiameter" ||
+          field === "width" ||
+          field === "loadIndex"
         ) {
           return { [field]: Number(value) };
         }

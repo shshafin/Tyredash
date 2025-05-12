@@ -17,6 +17,10 @@ export const tireFilterableFields = [
   "sectionWidth",
   "aspectRatio",
   "rimDiameter",
+  "width",
+  "diameterRange",
+  "loadIndex",
+  "loadIndexRange",
 ];
 
 export const tireSearchableFields = [

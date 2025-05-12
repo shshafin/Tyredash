@@ -16,8 +16,10 @@ export const wheelFilterableFields = [
   "stockQuantity",
   "constructionType",
   "materialType",
+  "wheelWidth",
   "RimDiameter",
   "RimWidth",
+  "offset",
 ];
 
 export const wheelSearchableFields = [

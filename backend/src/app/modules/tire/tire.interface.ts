@@ -24,7 +24,7 @@ export interface ITire {
   sidewallDescriptionRange: string;
   temperatureGradeRange: string;
   sectionWidthRange: string;
-  diameterRange: number;
+  diameterRange: string;
   wheelRimDiameterRange: string;
   tractionGradeRange: string;
   treadDepthRange: string;

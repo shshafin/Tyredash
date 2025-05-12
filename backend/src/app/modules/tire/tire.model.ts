@@ -92,7 +92,7 @@ const TireSchema = new Schema<ITire, ITireModel>(
       type: String,
     },
     diameterRange: {
-      type: Number,
+      type: String,
     },
     wheelRimDiameterRange: {
       type: String,
