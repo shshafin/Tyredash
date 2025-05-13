@@ -6,13 +6,16 @@ import { ICart } from "../cart/cart.interface";
 import { Cart } from "../cart/cart.model";
 import axios from "axios";
 import config from "../../../config";
-import { Tire } from "../tire/tire.model"; // Import the Tire model
+import { Tire } from "../tire/tire.model";
+import Stripe from "stripe";
+
+const stripe = new Stripe(config.stripe.secret_key || "", {
+  apiVersion: "2025-04-30.basil",
+});
+
 import { Wheel } from "../wheel/wheel.model";
 import { Product } from "../product/product.model";
 import { OrderService } from "../order/order.service";
-
-// Initialize PayPal and Stripe
-const stripe = require("stripe")(config.stripe.secret_key);
 
 export const createPaymentIntent = async (
   userId: Types.ObjectId,
@@ -23,7 +26,6 @@ export const createPaymentIntent = async (
     shippingAddress: any;
   }
 ) => {
-  // Get the cart and verify it belongs to the user
   const cart = await Cart.findOne({ _id: cartId, user: userId }).populate(
     "items.product"
   );
@@ -54,7 +56,6 @@ export const createPaymentIntent = async (
       return await createPaypalPayment(payment, cart);
     }
   } catch (error) {
-    // Update payment status to failed if something goes wrong
     await Payment.findByIdAndUpdate(payment._id, { paymentStatus: "failed" });
     throw error;
   }
@@ -62,10 +63,48 @@ export const createPaymentIntent = async (
 
 const createStripePayment = async (payment: any, cart: ICart) => {
   try {
-    // Create a Stripe payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(payment.amount * 100), // Stripe uses cents
-      currency: "usd",
+    const populatedItems = await Promise.all(
+      cart.items.map(async (item) => {
+        let productDetails = null;
+
+        if (item.productType === "tire") {
+          productDetails = await Tire.findById(item.product);
+        } else if (item.productType === "wheel") {
+          productDetails = await Wheel.findById(item.product);
+        } else if (item.productType === "product") {
+          productDetails = await Product.findById(item.product);
+        }
+
+        if (!productDetails) {
+          throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
+        }
+
+        return {
+          product: productDetails,
+          productType: item.productType,
+          quantity: item.quantity,
+          price: item.price,
+          name: item.name,
+          thumbnail: item.thumbnail,
+        };
+      })
+    );
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: populatedItems.map((item) => ({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.product.name,
+          },
+          unit_amount: Math.round(item.product.price * 100),
+        },
+        quantity: item.quantity,
+      })),
+      mode: "payment",
+      success_url: `${config.frontend_url}/payment/success?paymentId=${payment._id}`,
+      cancel_url: `${config.frontend_url}/payment/cancel?paymentId=${payment._id}`,
       metadata: {
         paymentId: payment._id.toString(),
         userId: payment.user.toString(),
@@ -73,19 +112,18 @@ const createStripePayment = async (payment: any, cart: ICart) => {
       },
     });
 
-    // Update payment with Stripe details
     await Payment.findByIdAndUpdate(payment._id, {
-      transactionId: paymentIntent.id,
+      transactionId: session.id,
       paymentDetails: {
-        clientSecret: paymentIntent.client_secret,
+        sessionId: session.id,
+        url: session.url,
       },
     });
 
     return {
       paymentId: payment._id,
-      clientSecret: paymentIntent.client_secret,
-      amount: payment.amount,
-      currency: "usd",
+      sessionId: session.id,
+      url: session.url,
     };
   } catch (error) {
     throw new ApiError(
@@ -94,6 +132,41 @@ const createStripePayment = async (payment: any, cart: ICart) => {
     );
   }
 };
+
+// const createStripePayment = async (payment: any, cart: ICart) => {
+//   try {
+//     // Create a Stripe payment intent
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount: Math.round(payment.amount * 100), // Stripe uses cents
+//       currency: "usd",
+//       metadata: {
+//         paymentId: payment._id.toString(),
+//         userId: payment.user.toString(),
+//         cartId: payment.cart.toString(),
+//       },
+//     });
+
+//     // Update payment with Stripe details
+//     await Payment.findByIdAndUpdate(payment._id, {
+//       transactionId: paymentIntent.id,
+//       paymentDetails: {
+//         clientSecret: paymentIntent.client_secret,
+//       },
+//     });
+
+//     return {
+//       paymentId: payment._id,
+//       clientSecret: paymentIntent.client_secret,
+//       amount: payment.amount,
+//       currency: "usd",
+//     };
+//   } catch (error) {
+//     throw new ApiError(
+//       httpStatus.INTERNAL_SERVER_ERROR,
+//       `Stripe payment error: ${error instanceof Error ? error.message : "Unknown error"}`
+//     );
+//   }
+// };
 
 const createPaypalPayment = async (payment: any, cart: ICart) => {
   try {
