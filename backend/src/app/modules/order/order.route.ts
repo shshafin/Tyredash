@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
   "/",
   auth(ENUM_USER_ROLE.USER),
-  validateRequest(OrderValidation.createOrderZodSchema),
+  // validateRequest(OrderValidation.createOrderZodSchema),
   OrderController.createOrder
 );
 
@@ -29,7 +29,7 @@ router.get(
 router.patch(
   "/:id/status",
   auth(ENUM_USER_ROLE.ADMIN),
-  validateRequest(OrderValidation.updateOrderStatusZodSchema),
+  // validateRequest(OrderValidation.updateOrderStatusZodSchema),
   OrderController.updateOrderStatus
 );
 

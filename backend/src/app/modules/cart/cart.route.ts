@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(
   "/",
   auth(ENUM_USER_ROLE.ADMIN),
-  validateRequest(CartValidation.createCartZodSchema),
+  // validateRequest(CartValidation.createCartZodSchema),
   CartController.createCart
 );
 
@@ -30,7 +30,7 @@ router.get(
 router.post(
   "/:userId/items",
   auth(ENUM_USER_ROLE.USER),
-  validateRequest(CartValidation.addItemToCartZodSchema),
+  // validateRequest(CartValidation.addItemToCartZodSchema),
   CartController.addItemToCart
 );
 
@@ -38,7 +38,7 @@ router.post(
 router.patch(
   "/:userId/items/:productId",
   auth(ENUM_USER_ROLE.USER),
-  validateRequest(CartValidation.updateCartItemZodSchema),
+  // validateRequest(CartValidation.updateCartItemZodSchema),
   CartController.updateItemQuantity // Note: renamed from updateCartItemQuantity
 );
 
