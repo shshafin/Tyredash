@@ -32,12 +32,45 @@ const imageFilter = (
   }
 };
 
+// File filter (updated to handle CSV)
 const fileFilter = (
   req: Request,
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
-  cb(null, true);
+  const allowedMimeTypes = [
+    "text/csv",
+    "application/vnd.ms-excel",
+    "text/plain", // Some CSV files may have this mime type
+    "application/csv",
+    "application/x-csv",
+    "text/x-csv",
+    "text/comma-separated-values",
+    "text/x-comma-separated-values",
+  ];
+
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only CSV files are allowed!"));
+  }
+};
+
+// CSV-specific filter (optional, if you want separate handling)
+const csvFilter = (
+  req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) => {
+  if (
+    file.mimetype === "text/csv" ||
+    file.mimetype === "application/vnd.ms-excel" ||
+    path.extname(file.originalname).toLowerCase() === ".csv"
+  ) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only CSV files are allowed!"));
+  }
 };
 
 export const uploadImage = multer({
@@ -54,9 +87,16 @@ export const uploadImages = multer({
 
 export const uploadFile = multer({
   storage: storage,
-  fileFilter: fileFilter,
+  fileFilter: fileFilter, // Now properly checks for CSV
   limits: { fileSize: 20 * 1024 * 1024 },
 }).single("file");
+
+// New dedicated CSV upload middleware
+export const uploadCSV = multer({
+  storage: storage,
+  fileFilter: csvFilter,
+  limits: { fileSize: 20 * 1024 * 1024 },
+}).single("csvfile"); // Using different field name for clarity
 
 export const uploadFiles = multer({
   storage: storage,

@@ -145,10 +145,381 @@ const deleteTire = async (id: string): Promise<ITire | null> => {
   return result;
 };
 
+import fs from "fs";
+import csv from "csv-parser";
+import { Year } from "../year/year.model";
+import { Make } from "../makes/make.model";
+import { CarModel } from "../models/model.model";
+import { Trim } from "../trims/trim.model";
+import { TireSize } from "../tire-size/tire-size.model";
+import { Brand } from "../brand/brand.model";
+import { Category } from "../category/category.model";
+import { DrivingType } from "../driving-type/driving-type.model";
+
+// const processCSVUpload = async (filePath: string): Promise<any> => {
+//   const results: any[] = [];
+
+//   // Read and parse the CSV file
+//   await new Promise<void>((resolve, reject) => {
+//     fs.createReadStream(filePath)
+//       .pipe(csv())
+//       .on("data", (row: Record<string, any>) => {
+//         results.push(row);
+//       })
+//       .on("end", () => {
+//         resolve();
+//       })
+//       .on("error", (err: Error) => {
+//         reject(err);
+//       });
+//   });
+
+//   // Process each row
+//   for (const row of results) {
+//     try {
+//       // 1. Handle Year - find or create
+//       const year = await Year.findOneAndUpdate(
+//         { year: Number(row.year) },
+//         {
+//           $setOnInsert: {
+//             year: Number(row.year),
+//           },
+//         },
+//         { upsert: true, new: true }
+//       );
+
+//       // 2. Handle Make - find or create
+//       const make = await Make.findOneAndUpdate(
+//         { make: row.make },
+//         { $setOnInsert: { make: row.make, logo: row.logo || "" } },
+//         { upsert: true, new: true }
+//       );
+
+//       // 3. Handle Model - find or create under this specific make and year
+//       const model = await CarModel.findOneAndUpdate(
+//         {
+//           model: row.model,
+//           make: make._id,
+//           year: year._id,
+//         },
+//         {
+//           $setOnInsert: {
+//             model: row.model,
+//             make: make._id,
+//             year: year._id,
+//           },
+//         },
+//         { upsert: true, new: true }
+//       );
+
+//       // 4. Handle Trim - find or create under this specific model, make, and year
+//       const trim = await Trim.findOneAndUpdate(
+//         {
+//           trim: row.trim,
+//           model: model._id,
+//           make: make._id,
+//           year: year._id,
+//         },
+//         {
+//           $setOnInsert: {
+//             trim: row.trim,
+//             model: model._id,
+//             make: make._id,
+//             year: year._id,
+//           },
+//         },
+//         { upsert: true, new: true }
+//       );
+
+//       // 5. Handle Tire Size - find or create under the trim
+//       const tireSize = await TireSize.findOneAndUpdate(
+//         {
+//           tireSize: row.tireSize,
+//           trim: trim._id,
+//         },
+//         {
+//           $setOnInsert: {
+//             tireSize: row.tireSize,
+//             trim: trim._id,
+//           },
+//         },
+//         { upsert: true, new: true }
+//       );
+
+//       // 6. Handle Brand - find or create
+//       const brand = await Brand.findOneAndUpdate(
+//         { name: row.brand },
+//         {
+//           $setOnInsert: {
+//             name: row.brand,
+//             description: row.description || "",
+//             logo: row.brandLogo || "",
+//           },
+//         },
+//         { upsert: true, new: true }
+//       );
+
+//       // 7. Handle Category - find or create
+//       const category = await Category.findOneAndUpdate(
+//         { name: row.category },
+//         {
+//           $setOnInsert: {
+//             name: row.category,
+//             slug: row.categorySlug || row.category.toLowerCase(),
+//             isActive: true,
+//           },
+//         },
+//         { upsert: true, new: true }
+//       );
+
+//       // 8. Handle Tire - Create or Update tire
+//       await Tire.findOneAndUpdate(
+//         {
+//           model: model._id,
+//           trim: trim._id,
+//           tireSize: tireSize._id,
+//           brand: brand._id,
+//           category: category._id,
+//         },
+//         {
+//           $setOnInsert: {
+//             name: row.name,
+//             description: row.description,
+//             images: row.images ? row.images.split(",") : [],
+//             productLine: row.productLine,
+//             unitName: row.unitName,
+//             conditionInfo: row.conditionInfo,
+//             grossWeightRange: row.grossWeightRange,
+//             gtinRange: row.gtinRange,
+//             loadIndexRange: row.loadIndexRange,
+//             mileageWarrantyRange: row.mileageWarrantyRange,
+//             maxAirPressureRange: row.maxAirPressureRange,
+//             speedRatingRange: row.speedRatingRange,
+//             sidewallDescriptionRange: row.sidewallDescriptionRange,
+//             temperatureGradeRange: row.temperatureGradeRange,
+//             sectionWidthRange: row.sectionWidthRange,
+//             diameterRange: row.diameterRange,
+//             wheelRimDiameterRange: row.wheelRimDiameterRange,
+//             tractionGradeRange: row.tractionGradeRange,
+//             treadDepthRange: row.treadDepthRange,
+//             treadWidthRange: row.treadWidthRange,
+//             overallWidthRange: row.overallWidthRange,
+//             treadwearGradeRange: row.treadwearGradeRange,
+//             sectionWidth: row.sectionWidth,
+//             aspectRatio: row.aspectRatio,
+//             rimDiameter: row.rimDiameter,
+//             overallDiameter: row.overallDiameter,
+//             rimWidthRange: row.rimWidthRange,
+//             width: row.width,
+//             treadDepth: row.treadDepth,
+//             loadIndex: row.loadIndex,
+//             loadRange: row.loadRange,
+//             maxPSI: row.maxPSI,
+//             warranty: row.warranty,
+//             aspectRatioRange: row.aspectRatioRange,
+//             treadPattern: row.treadPattern,
+//             loadCapacity: row.loadCapacity,
+//             constructionType: row.constructionType,
+//             tireType: row.tireType,
+//             price: row.price,
+//             discountPrice: row.discountPrice,
+//             stockQuantity: row.stockQuantity,
+
+//             // Other fields
+//           },
+//         },
+//         { upsert: true }
+//       );
+//     } catch (error) {
+//       console.error(`Error processing row: ${JSON.stringify(row)}`, error);
+//       // Continue processing other rows
+//     }
+//   }
+
+//   return { message: "CSV data processed successfully" };
+// };
+
+const parseNumber = (value: any, defaultValue = 0): number => {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? defaultValue : parsed;
+};
+
+const uploadCSVTires = async (filePath: string): Promise<any> => {
+  const results: any[] = [];
+
+  await new Promise<void>((resolve, reject) => {
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on("data", (row) => results.push(row))
+      .on("end", resolve)
+      .on("error", reject);
+  });
+
+  for (const row of results) {
+    try {
+      const year = await Year.findOneAndUpdate(
+        { year: parseInt(row.year) },
+        { $setOnInsert: { year: parseInt(row.year) } },
+        { upsert: true, new: true }
+      );
+
+      const make = await Make.findOneAndUpdate(
+        { make: row.make },
+        { $setOnInsert: { make: row.make, logo: row.logo || "" } },
+        { upsert: true, new: true }
+      );
+
+      const model = await CarModel.findOneAndUpdate(
+        { model: row.model, make: make._id, year: year._id },
+        { $setOnInsert: { model: row.model, make: make._id, year: year._id } },
+        { upsert: true, new: true }
+      );
+
+      const trim = await Trim.findOneAndUpdate(
+        { trim: row.trim, model: model._id, make: make._id, year: year._id },
+        {
+          $setOnInsert: {
+            trim: row.trim,
+            model: model._id,
+            make: make._id,
+            year: year._id,
+          },
+        },
+        { upsert: true, new: true }
+      );
+
+      const tireSize = await TireSize.findOneAndUpdate(
+        { tireSize: row.tireSize, trim: trim._id },
+        {
+          $setOnInsert: {
+            tireSize: row.tireSize,
+            trim: trim._id,
+            model: model._id,
+            make: make._id,
+            year: year._id,
+          },
+        },
+        { upsert: true, new: true }
+      );
+
+      const brand = await Brand.findOneAndUpdate(
+        { name: row.brand },
+        {
+          $setOnInsert: {
+            name: row.brand,
+            description: row.brandDescription || "",
+            logo: row.brandLogo || "",
+          },
+        },
+        { upsert: true, new: true }
+      );
+
+      const category = await Category.findOneAndUpdate(
+        { name: row.category },
+        {
+          $setOnInsert: {
+            name: row.category,
+            slug: row.categorySlug || row.category.toLowerCase(),
+            isActive: true,
+          },
+        },
+        { upsert: true, new: true }
+      );
+
+      const drivingType = await DrivingType.findOneAndUpdate(
+        {
+          title: row.drivingTypeTitle,
+          subTitle: row.drivingTypeSubTitle,
+        },
+        {
+          $setOnInsert: {
+            title: row.drivingTypeTitle,
+            subTitle: row.drivingTypeSubTitle,
+            options: row.drivingTypeOptions
+              ? row.drivingTypeOptions.split(",")
+              : [],
+          },
+        },
+        { upsert: true, new: true }
+      );
+
+      await Tire.findOneAndUpdate(
+        {
+          year: year._id,
+          make: make._id,
+          model: model._id,
+          trim: trim._id,
+          tireSize: tireSize._id,
+          drivingType: drivingType?._id,
+        },
+        {
+          $setOnInsert: {
+            name: row.name,
+            year: year._id,
+            make: make._id,
+            model: model._id,
+            trim: trim._id,
+            tireSize: tireSize._id,
+            drivingType: drivingType?._id,
+            brand: brand._id,
+            category: category._id,
+            description: row.description || "",
+            images: row.images ? row.images.split(",") : [],
+            productLine: row.productLine || "",
+            unitName: row.unitName || "",
+            conditionInfo: row.conditionInfo || "",
+            grossWeightRange: row.grossWeightRange || "",
+            gtinRange: row.gtinRange || "",
+            loadIndexRange: row.loadIndexRange || "",
+            mileageWarrantyRange: row.mileageWarrantyRange || "",
+            maxAirPressureRange: row.maxAirPressureRange || "",
+            speedRatingRange: row.speedRatingRange || "",
+            sidewallDescriptionRange: row.sidewallDescriptionRange || "",
+            temperatureGradeRange: row.temperatureGradeRange || "",
+            sectionWidthRange: row.sectionWidthRange || "",
+            diameterRange: row.diameterRange || "",
+            wheelRimDiameterRange: row.wheelRimDiameterRange || "",
+            tractionGradeRange: row.tractionGradeRange || "",
+            treadDepthRange: row.treadDepthRange || "",
+            treadWidthRange: row.treadWidthRange || "",
+            overallWidthRange: row.overallWidthRange || "",
+            treadwearGradeRange: row.treadwearGradeRange || "",
+            sectionWidth: parseNumber(row.sectionWidth),
+            aspectRatio: parseNumber(row.aspectRatio),
+            rimDiameter: parseNumber(row.rimDiameter),
+            overallDiameter: parseNumber(row.overallDiameter),
+            rimWidthRange: parseNumber(row.rimWidthRange),
+            width: parseNumber(row.width),
+            treadDepth: parseNumber(row.treadDepth),
+            loadIndex: parseNumber(row.loadIndex),
+            loadRange: row.loadRange || "",
+            maxPSI: parseNumber(row.maxPSI),
+            warranty: row.warranty || "",
+            aspectRatioRange: row.aspectRatioRange || "",
+            treadPattern: row.treadPattern || "",
+            loadCapacity: parseNumber(row.loadCapacity),
+            constructionType: row.constructionType || "",
+            tireType: row.tireType || "",
+            price: parseNumber(row.price),
+            discountPrice: parseNumber(row.discountPrice),
+            stockQuantity: parseNumber(row.stockQuantity),
+          },
+        },
+        { upsert: true }
+      );
+    } catch (error) {
+      console.error(`Error processing row: ${JSON.stringify(row)}`, error);
+    }
+  }
+
+  return { message: "CSV data processed successfully" };
+};
+
 export const TireService = {
   createTire,
   getAllTires,
   getSingleTire,
   updateTire,
   deleteTire,
+  uploadCSVTires,
 };

@@ -35,6 +35,26 @@ const createTire = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const uploadCSVTires = catchAsync(async (req: Request, res: Response) => {
+  if (!req.file) {
+    throw new Error("No file uploaded");
+  }
+
+  const filePath = req.file.path;
+
+  const result = await TireService.uploadCSVTires(filePath);
+
+  sendResponse<any>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.message || "CSV processed successfully",
+    data: {
+      processedCount: result.processedCount,
+      // You can add more metadata here if needed
+    },
+  });
+});
+
 const getAllTires = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, tireFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
@@ -146,4 +166,5 @@ export const TireController = {
   getSingleTire,
   updateTire,
   deleteTire,
+  uploadCSVTires,
 };
