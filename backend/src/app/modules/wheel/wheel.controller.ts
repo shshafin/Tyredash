@@ -36,6 +36,26 @@ const createWheel = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const uploadCSVTires = catchAsync(async (req: Request, res: Response) => {
+  if (!req.file) {
+    throw new Error("No file uploaded");
+  }
+
+  const filePath = req.file.path;
+
+  const result = await WheelService.uploadWheelCSV(filePath);
+
+  sendResponse<any>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.message || "CSV processed successfully",
+    data: {
+      processedCount: result.processedCount,
+      // You can add more metadata here if needed
+    },
+  });
+});
+
 const getAllWheels = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, wheelFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
@@ -148,4 +168,5 @@ export const WheelController = {
   getSingleWheel,
   updateWheel,
   deleteWheel,
+  uploadCSVTires,
 };

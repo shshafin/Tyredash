@@ -4,9 +4,16 @@ import { WheelController } from "./wheel.controller";
 import { WheelValidation } from "./wheel.validation";
 import auth from "../../middlewares/auth";
 import { ENUM_USER_ROLE } from "../../../enum/user";
-import { uploadImages } from "../../../helpers/fileHandlers";
+import { uploadCSV, uploadImages } from "../../../helpers/fileHandlers";
 
 const router = express.Router();
+
+router.post(
+  "/import-csv",
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  uploadCSV, // Using single file upload
+  WheelController.uploadCSVTires
+);
 
 router.post(
   "/create",
