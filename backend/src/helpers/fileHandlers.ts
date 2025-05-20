@@ -11,24 +11,48 @@ const storage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
+    // const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
+    // cb(null, uniqueName);
+    const originalName = file.originalname;
+    cb(null, originalName);
   },
 });
+
+// const imageFilter = (
+//   req: Request,
+//   file: Express.Multer.File,
+//   cb: multer.FileFilterCallback
+// ) => {
+//   if (
+//     file.mimetype === "image/png" ||
+//     file.mimetype === "image/jpg" ||
+//     file.mimetype === "image/jpeg"
+//   ) {
+//     cb(null, true);
+//   } else {
+//     cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
+//   }
+// };
 
 const imageFilter = (
   req: Request,
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
-  if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
-  ) {
+  const allowedMimeTypes = [
+    "image/png",
+    "image/jpg",
+    "image/jpeg",
+    "image/gif",
+    "image/webp",
+  ];
+
+  if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
+    cb(
+      new Error("Only .png, .jpg, .jpeg, .gif, and .webp formats are allowed!")
+    );
   }
 };
 
@@ -82,8 +106,8 @@ export const uploadImage = multer({
 export const uploadImages = multer({
   storage: storage,
   fileFilter: imageFilter,
-  limits: { fileSize: 5 * 1024 * 1024, files: 10 },
-}).array("images", 10);
+  limits: { fileSize: 10 * 1024 * 1024, files: 100 },
+}).array("images", 100);
 
 export const uploadFile = multer({
   storage: storage,
