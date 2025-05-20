@@ -13,7 +13,7 @@ const create = async (userData: IUser): Promise<IUser | null> => {
   if (isExist) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User already exists");
   }
-  console.log("userData", userData);
+
   const user = await User.create(userData);
 
   // Return user without password

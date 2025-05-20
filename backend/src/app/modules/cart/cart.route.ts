@@ -43,7 +43,7 @@ router.patch(
 );
 
 // Remove item from cart - user can modify their own cart
-router.delete(
+router.put(
   "/:userId/items/:productId",
   auth(ENUM_USER_ROLE.USER),
   CartController.removeItemFromCart
