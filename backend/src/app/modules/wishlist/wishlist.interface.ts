@@ -1,9 +1,9 @@
 import { Document, Model, Types } from "mongoose";
 
-export type WishlistItem = {
+export interface WishlistItem extends Document {
   product: Types.ObjectId;
-  productType: "tire" | "wheel";
-};
+  productType: "tire" | "wheel" | "product";
+}
 
 export interface IWishlist extends Document {
   user: Types.ObjectId;

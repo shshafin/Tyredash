@@ -4,8 +4,8 @@ const wishlistItemSchema = z.object({
   product: z.string({
     required_error: "Product ID is required",
   }),
-  productType: z.enum(["tire", "wheel"], {
-    required_error: "Product type must be either 'tire' or 'wheel'",
+  productType: z.enum(["tire", "wheel", "product"], {
+    required_error: "Product type must be either 'tire', 'wheel', or 'product'",
   }),
 });
 

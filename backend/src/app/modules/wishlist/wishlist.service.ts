@@ -2,6 +2,8 @@ import { IWishlist, WishlistItem } from "./wishlist.interface";
 import { Wishlist } from "./wishlist.model";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
+import mongoose from "mongoose";
+import { Types } from "mongoose";
 
 const createWishlist = async (userId: string): Promise<IWishlist> => {
   const isExist = await Wishlist.findOne({ user: userId });
@@ -15,16 +17,76 @@ const createWishlist = async (userId: string): Promise<IWishlist> => {
   return result;
 };
 
+// const getWishlistByUserId = async (
+//   userId: string
+// ): Promise<IWishlist | null> => {
+//   const result = await Wishlist.findOne({ user: userId })
+//     .populate("user")
+//     .populate("items.product");
+
+//   console.log("items data", result?.items);
+
+//   if (!result) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "Wishlist not found");
+//   }
+//   return result;
+// };
+
 const getWishlistByUserId = async (
   userId: string
 ): Promise<IWishlist | null> => {
-  const result = await Wishlist.findOne({ user: userId })
+  // First fetch the wishlist with user populated
+  const wishlist = await Wishlist.findOne({ user: userId })
     .populate("user")
-    .populate("items.product");
-  if (!result) {
+    .lean()
+    .exec();
+
+  if (!wishlist) {
     throw new ApiError(httpStatus.NOT_FOUND, "Wishlist not found");
   }
-  return result;
+
+  // Manually populate each product based on its type
+  const populatedItems = await Promise.all(
+    wishlist.items.map(async (item) => {
+      let populatedProduct: Types.ObjectId | Document | null = item.product;
+
+      try {
+        switch (item.productType) {
+          case "tire":
+            populatedProduct = await mongoose
+              .model("Tire")
+              .findById(item.product);
+            break;
+          case "wheel":
+            populatedProduct = await mongoose
+              .model("Wheel")
+              .findById(item.product);
+            break;
+          case "product":
+            populatedProduct = await mongoose
+              .model("Product")
+              .findById(item.product);
+            break;
+        }
+      } catch (error) {
+        console.error(`Error populating product ${item.product}:`, error);
+      }
+
+      return {
+        ...item,
+        product:
+          populatedProduct &&
+          typeof (populatedProduct as any).toObject === "function"
+            ? (populatedProduct as any).toObject()
+            : item.product,
+      };
+    })
+  );
+
+  return {
+    ...wishlist,
+    items: populatedItems,
+  } as unknown as IWishlist; // Type assertion to handle lean transformation
 };
 
 const addItemToWishlist = async (
@@ -34,6 +96,11 @@ const addItemToWishlist = async (
   const wishlist = await Wishlist.findOne({ user: userId });
   if (!wishlist) {
     throw new ApiError(httpStatus.NOT_FOUND, "Wishlist not found");
+  }
+
+  // Validate productType
+  if (!["tire", "wheel", "product"].includes(item.productType)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid product type");
   }
 
   // Check if item already exists in wishlist

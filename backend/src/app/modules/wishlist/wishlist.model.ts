@@ -12,7 +12,11 @@ const wishlistSchema = new Schema<IWishlist, IWishlistModel>(
     items: [
       {
         product: { type: Schema.Types.ObjectId, required: true },
-        productType: { type: String, enum: ["tire", "wheel"], required: true },
+        productType: {
+          type: String,
+          enum: ["tire", "wheel", "product"],
+          required: true,
+        },
       },
     ],
   },

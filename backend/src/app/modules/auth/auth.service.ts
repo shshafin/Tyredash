@@ -18,7 +18,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { email, password } = payload;
 
   // If user does not exist or password is incorrect
-  const isUserExist = await User.isUserExist(email);
+  const isUserExist = await User.findOne({ email: email });
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, "user does not exist");
   }
@@ -32,17 +32,22 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
 
   // If user exists and password is correct, return the user object with the token and refresh token
 
-  const { email: userEmail, role, needsPasswordChange } = isUserExist;
+  const {
+    email: userEmail,
+    role,
+    needsPasswordChange,
+    _id: userId,
+  } = isUserExist;
   // TODO: generate token and refresh token here
   const accessToken = jwtHelpers.createToken(
-    { userEmail, role },
+    { userEmail, role, userId },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );
 
   // refresh token
   const refreshToken = jwtHelpers.createToken(
-    { userEmail, role },
+    { userEmail, role, userId },
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string
   );

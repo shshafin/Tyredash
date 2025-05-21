@@ -6,7 +6,7 @@ import { WishlistService } from "./wishlist.service";
 import { IWishlist } from "./wishlist.interface";
 
 const createWishlist = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?._id;
+  const userId = req.user?.userId;
   const result = await WishlistService.createWishlist(userId);
 
   sendResponse<IWishlist>(res, {
@@ -18,7 +18,7 @@ const createWishlist = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyWishlist = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?._id;
+  const userId = req.user?.userId;
   const result = await WishlistService.getWishlistByUserId(userId);
 
   sendResponse<IWishlist>(res, {
@@ -30,8 +30,18 @@ const getMyWishlist = catchAsync(async (req: Request, res: Response) => {
 });
 
 const addItemToWishlist = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?._id;
+  const userId = req.user?.userId;
   const item = req.body;
+
+  // Check if product type is valid
+  if (!["tire", "wheel", "product"].includes(item.productType)) {
+    return sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "Invalid product type",
+    });
+  }
+
   const result = await WishlistService.addItemToWishlist(userId, item);
 
   sendResponse<IWishlist>(res, {
@@ -44,7 +54,7 @@ const addItemToWishlist = catchAsync(async (req: Request, res: Response) => {
 
 const removeItemFromWishlist = catchAsync(
   async (req: Request, res: Response) => {
-    const userId = req.user?._id;
+    const userId = req.user?.userId;
     const { productId } = req.params;
     const result = await WishlistService.removeItemFromWishlist(
       userId,
@@ -61,7 +71,7 @@ const removeItemFromWishlist = catchAsync(
 );
 
 const clearWishlist = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?._id;
+  const userId = req.user?.userId;
   const result = await WishlistService.clearWishlist(userId);
 
   sendResponse<IWishlist>(res, {
