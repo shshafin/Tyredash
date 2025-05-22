@@ -93,17 +93,18 @@ const addItemToWishlist = async (
   userId: string,
   item: WishlistItem
 ): Promise<IWishlist | null> => {
-  const wishlist = await Wishlist.findOne({ user: userId });
+  let wishlist = await Wishlist.findOne({ user: userId });
   if (!wishlist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Wishlist not found");
+    wishlist = await Wishlist.create({
+      user: userId,
+      items: [],
+    });
   }
 
-  // Validate productType
   if (!["tire", "wheel", "product"].includes(item.productType)) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Invalid product type");
   }
 
-  // Check if item already exists in wishlist
   const itemExists = wishlist.items.some(
     (wishlistItem) =>
       wishlistItem.product.toString() === item.product.toString()
