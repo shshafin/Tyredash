@@ -1,35 +1,43 @@
-import { IReview } from "./review.interface";
 import { Review } from "./review.model";
+import {
+  IReview,
+  IPopulatedReview,
+  IUserPreview,
+  IReviewStats,
+  IProductWithReviews,
+} from "./review.interface";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
-import { SortOrder } from "mongoose";
+import mongoose, { SortOrder, Types } from "mongoose";
 import { reviewSearchableFields } from "./review.constants";
 
-const createReview = async (reviewData: IReview): Promise<IReview> => {
-  const isExist = await Review.findOne({
-    user: reviewData.user,
-    product: reviewData.product,
-    productType: reviewData.productType,
+const getUserPreviewFields = "firstName lastName email avatar";
+
+const createReview = async (payload: IReview): Promise<IReview> => {
+  // Check for existing review
+  const existingReview = await Review.findOne({
+    user: payload.user,
+    product: payload.product,
+    productType: payload.productType,
   });
 
-  if (isExist) {
+  if (existingReview) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       "You have already reviewed this product"
     );
   }
 
-  const result = await Review.create(reviewData);
-  return result;
+  return Review.create(payload);
 };
 
 const getAllReviews = async (
   filters: any,
   paginationOptions: IPaginationOptions
-): Promise<IGenericResponse<IReview[]>> => {
+): Promise<IGenericResponse<IPopulatedReview[]>> => {
   const { searchTerm, ...filtersData } = filters;
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
@@ -63,66 +71,73 @@ const getAllReviews = async (
   const whereConditions =
     andConditions.length > 0 ? { $and: andConditions } : {};
 
-  const result = await Review.find(whereConditions)
-    .populate("user")
-    .sort(sortConditions)
-    .skip(skip)
-    .limit(limit);
-
-  const total = await Review.countDocuments(whereConditions);
+  const [result, total] = await Promise.all([
+    Review.find(whereConditions)
+      .populate<{ user: IUserPreview }>({
+        path: "user",
+        select: getUserPreviewFields,
+      })
+      .sort(sortConditions)
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Review.countDocuments(whereConditions),
+  ]);
 
   return {
-    meta: {
-      page,
-      limit,
-      total,
-    },
-    data: result,
+    meta: { page, limit, total },
+    data: result as IPopulatedReview[],
   };
 };
 
-const getSingleReview = async (id: string): Promise<IReview | null> => {
-  const result = await Review.findById(id).populate("user");
-  if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Review not found");
-  }
-  return result;
+const getSingleReview = async (id: string): Promise<IPopulatedReview> => {
+  const result = await Review.findById(id)
+    .populate<{ user: IUserPreview }>({
+      path: "user",
+      select: getUserPreviewFields,
+    })
+    .orFail(() => new ApiError(httpStatus.NOT_FOUND, "Review not found"))
+    .lean();
+
+  return result as IPopulatedReview;
 };
 
 const updateReview = async (
   id: string,
   payload: Partial<IReview>,
   userId: string
-): Promise<IReview | null> => {
-  const isExist = await Review.findById(id);
-  if (!isExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Review not found");
-  }
+): Promise<IPopulatedReview> => {
+  const review = await Review.findById(id).orFail(
+    () => new ApiError(httpStatus.NOT_FOUND, "Review not found")
+  );
 
-  // Check if the user is the owner of the review
-  if (isExist.user.toString() !== userId) {
+  if (review.user.toString() !== userId) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
       "You can only update your own reviews"
     );
   }
 
-  const result = await Review.findOneAndUpdate({ _id: id }, payload, {
+  const updatedReview = await Review.findByIdAndUpdate(id, payload, {
     new: true,
-  });
-  return result;
+  })
+    .populate<{ user: IUserPreview }>({
+      path: "user",
+      select: getUserPreviewFields,
+    })
+    .lean();
+
+  return updatedReview as IPopulatedReview;
 };
 
 const deleteReview = async (
   id: string,
   userId: string
-): Promise<IReview | null> => {
-  const review = await Review.findById(id);
-  if (!review) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Review not found");
-  }
+): Promise<IPopulatedReview> => {
+  const review = await Review.findById(id).orFail(
+    () => new ApiError(httpStatus.NOT_FOUND, "Review not found")
+  );
 
-  // Check if the user is the owner of the review or an admin
   if (review.user.toString() !== userId) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
@@ -130,18 +145,137 @@ const deleteReview = async (
     );
   }
 
-  const result = await Review.findByIdAndDelete(id);
-  return result;
+  const deletedReview = await Review.findByIdAndDelete(id)
+    .populate<{ user: IUserPreview }>({
+      path: "user",
+      select: getUserPreviewFields,
+    })
+    .lean();
+
+  return deletedReview as IPopulatedReview;
 };
 
 const getReviewsByProduct = async (
   productId: string,
-  productType: string
-): Promise<IReview[]> => {
-  const result = await Review.find({ product: productId, productType })
-    .populate("user")
-    .sort({ createdAt: -1 });
-  return result;
+  productType: "tire" | "wheel" | "product"
+): Promise<IPopulatedReview[]> => {
+  return Review.find({ product: productId, productType })
+    .populate<{ user: IUserPreview }>({
+      path: "user",
+      select: getUserPreviewFields,
+    })
+    .sort({ createdAt: -1 })
+    .lean() as Promise<IPopulatedReview[]>;
+};
+
+const getReviewStats = async (
+  productId: string,
+  productType: "tire" | "wheel" | "product"
+): Promise<IReviewStats> => {
+  const [stats] = await Review.aggregate<IReviewStats>([
+    {
+      $match: {
+        product: new Types.ObjectId(productId),
+        productType,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        averageRating: { $avg: "$rating" },
+        reviewCount: { $sum: 1 },
+        ratingDistribution: {
+          $push: "$rating",
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        averageRating: { $round: ["$averageRating", 1] },
+        reviewCount: 1,
+        ratingDistribution: {
+          1: {
+            $size: {
+              $filter: {
+                input: "$ratingDistribution",
+                as: "rating",
+                cond: { $eq: ["$$rating", 1] },
+              },
+            },
+          },
+          2: {
+            $size: {
+              $filter: {
+                input: "$ratingDistribution",
+                as: "rating",
+                cond: { $eq: ["$$rating", 2] },
+              },
+            },
+          },
+          3: {
+            $size: {
+              $filter: {
+                input: "$ratingDistribution",
+                as: "rating",
+                cond: { $eq: ["$$rating", 3] },
+              },
+            },
+          },
+          4: {
+            $size: {
+              $filter: {
+                input: "$ratingDistribution",
+                as: "rating",
+                cond: { $eq: ["$$rating", 4] },
+              },
+            },
+          },
+          5: {
+            $size: {
+              $filter: {
+                input: "$ratingDistribution",
+                as: "rating",
+                cond: { $eq: ["$$rating", 5] },
+              },
+            },
+          },
+        },
+      },
+    },
+  ]);
+
+  return (
+    stats || {
+      averageRating: 0,
+      reviewCount: 0,
+      ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+    }
+  );
+};
+
+const getProductWithReviews = async <T>(
+  productId: string,
+  productType: "tire" | "wheel" | "product"
+): Promise<IProductWithReviews<T>> => {
+  const modelName = productType.charAt(0).toUpperCase() + productType.slice(1);
+  const productModel = mongoose.model<T>(modelName);
+
+  const [productDoc, reviews, stats] = await Promise.all([
+    productModel.findById(productId).lean(),
+    getReviewsByProduct(productId, productType),
+    getReviewStats(productId, productType),
+  ]);
+
+  if (!productDoc) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
+  }
+
+  return {
+    product: productDoc as T,
+    reviews,
+    stats,
+  };
 };
 
 export const ReviewService = {
@@ -151,4 +285,6 @@ export const ReviewService = {
   updateReview,
   deleteReview,
   getReviewsByProduct,
+  getReviewStats,
+  getProductWithReviews,
 };

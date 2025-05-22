@@ -1,9 +1,8 @@
-export const productType = ["tire", "wheel"] as const;
+export const reviewSearchableFields = ["comment", "rating"];
 export const reviewFilterableFields = [
   "searchTerm",
-  "user",
   "product",
   "productType",
+  "user",
   "rating",
 ];
-export const reviewSearchableFields = ["comment"];
