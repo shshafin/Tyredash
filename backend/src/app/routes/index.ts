@@ -18,6 +18,7 @@ import { ReviewRoutes } from "../modules/review/review.route";
 import { WishlistRoutes } from "../modules/wishlist/wishlist.routes";
 import { PaymentRoutes } from "../modules/payment/payment.routes";
 import { UploadRoutes } from "../modules/upload-images/upload.route";
+import { OrderRoutes } from "../modules/order/order.route";
 
 const router = express.Router();
 
@@ -89,6 +90,10 @@ const modulesRoutes = [
   {
     path: "/payment",
     module: PaymentRoutes,
+  },
+  {
+    path: "/order",
+    module: OrderRoutes,
   },
   {
     path: "/upload",
