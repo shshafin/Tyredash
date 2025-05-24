@@ -1,11 +1,13 @@
-export interface Deal {
+import { Document, Types } from "mongoose";
+
+export interface IDeal extends Document {
   title: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
-  discountAmount: number;
-  discountType: "percentage" | "fixed";
-  applicableBrands: string[];
-  termsAndConditions: string;
-  isActive: boolean;
+  discountPercentage: number;
+  applicableProducts: ("tire" | "wheel" | "product")[]; // Products the deal applies to (Tire, Wheel, Product)
+  brand: Types.ObjectId;
+  validFrom: Date;
+  validTo: Date;
 }
+
+export interface IDealModel extends IDeal {}

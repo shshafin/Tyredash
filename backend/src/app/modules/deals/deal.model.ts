@@ -1,58 +1,22 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { Deal } from "./deal.interface";
+import { Schema, model, Types } from "mongoose";
+import { IDeal } from "./deal.interface";
 
-const dealSchema: Schema = new Schema(
+const DealSchema = new Schema<IDeal>(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, required: true },
-    discountAmount: { type: Number, required: true },
-    discountType: {
-      type: String,
-      enum: ["percentage", "fixed"],
-      required: true,
+    discountPercentage: { type: Number, required: true },
+    applicableProducts: {
+      type: [String],
+      enum: ["tire", "wheel", "product"], // Specifies if the deal applies to tire, wheel, or general product
     },
-    applicableBrands: [{ type: String }],
-    termsAndConditions: { type: String, required: true },
-    isActive: { type: Boolean, default: true },
+    brand: { type: Schema.Types.ObjectId, ref: "Brand", required: true },
+    validFrom: { type: Date, required: true },
+    validTo: { type: Date, required: true },
   },
   {
     timestamps: true,
   }
 );
 
-const DealModel = mongoose.model<Deal & Document>("Deal", dealSchema);
-
-export default DealModel;
-
-// import { Schema, model, Types } from 'mongoose';
-
-// const dealSchema = new Schema(
-//   {
-//     title: { type: String, required: true },
-//     description: { type: String, required: true },
-//     startDate: { type: Date, required: true },
-//     endDate: { type: Date, required: true },
-//     discountAmount: { type: Number, required: true },
-//     discountType: {
-//       type: String,
-//       enum: ['percentage', 'fixed'],
-//       required: true,
-//     },
-//     applicableBrands: [{ type: Types.ObjectId, ref: 'Brand' }],
-//     applicableProducts: [{ type: Types.ObjectId, refPath: 'productType' }],
-//     productType: {
-//       type: String,
-//       enum: ['Tire', 'Wheel', 'Product'],
-//       required: true,
-//     },
-//     termsAndConditions: { type: String, required: true },
-//     isActive: { type: Boolean, default: true },
-//   },
-//   { timestamps: true }
-// );
-
-// const Deal = model('Deal', dealSchema);
-
-// export default Deal;
+export const Deal = model<IDeal>("Deal", DealSchema);
