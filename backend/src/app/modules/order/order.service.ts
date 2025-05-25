@@ -89,7 +89,7 @@ const getAllOrders = async (
   }
 
   // For customers, only show their own orders
-  if (userRole === "customer" && userId) {
+  if (userRole === "user" && userId) {
     andConditions.push({ user: userId });
   }
 

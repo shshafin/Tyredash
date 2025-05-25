@@ -5,7 +5,7 @@ import sendResponse from "../../../shared/sendResponse";
 import { PaymentService } from "./payment.service";
 
 const createPayment = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?._id;
+  const userId = req.user?.userId;
   const { cartId, paymentMethod, billingAddress, shippingAddress } = req.body;
 
   const result = await PaymentService.createPaymentIntent(
@@ -25,7 +25,7 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
 
 const verifyStripePayment = catchAsync(async (req: Request, res: Response) => {
   const { paymentId, paymentIntentId } = req.body;
-  const userId = req.user?._id;
+  const userId = req.user?.userId;
 
   // Verify the payment belongs to the user
   await PaymentService.getPaymentById(paymentId, userId.toString());
@@ -47,7 +47,7 @@ const verifyStripePayment = catchAsync(async (req: Request, res: Response) => {
 
 const verifyPaypalPayment = catchAsync(async (req: Request, res: Response) => {
   const { paymentId, orderId } = req.body;
-  const userId = req.user?._id;
+  const userId = req.user?.userId;
 
   // Verify the payment belongs to the user
   await PaymentService.getPaymentById(paymentId, userId.toString());
@@ -66,7 +66,7 @@ const verifyPaypalPayment = catchAsync(async (req: Request, res: Response) => {
 
 const getPaymentDetails = catchAsync(async (req: Request, res: Response) => {
   const { paymentId } = req.params;
-  const userId = req.user?._id;
+  const userId = req.user?.userId;
 
   const result = await PaymentService.getPaymentById(
     paymentId,

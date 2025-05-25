@@ -18,7 +18,10 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { email, password } = payload;
 
   // If user does not exist or password is incorrect
-  const isUserExist = await User.findOne({ email: email });
+  const isUserExist = await User.findOne({ email }).select(
+    "+password role needsPasswordChange email _id"
+  );
+
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, "user does not exist");
   }
@@ -27,7 +30,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     isUserExist.password &&
     !(await User.isPasswordMatched(password, isUserExist.password))
   ) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "password mismatch");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Password is incorrect");
   }
 
   // If user exists and password is correct, return the user object with the token and refresh token
