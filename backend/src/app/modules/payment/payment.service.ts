@@ -17,7 +17,7 @@ import { Wheel } from "../wheel/wheel.model";
 import { Product } from "../product/product.model";
 import { OrderService } from "../order/order.service";
 
-export const createPaymentIntent = async (
+const createPaymentIntent = async (
   userId: Types.ObjectId,
   cartId: Types.ObjectId,
   paymentMethod: "paypal" | "stripe",
@@ -26,9 +26,8 @@ export const createPaymentIntent = async (
     shippingAddress: any;
   }
 ) => {
-  const cart = await Cart.findOne({ _id: cartId, user: userId }).populate(
-    "items.product"
-  );
+  // Fetch cart data
+  const cart = await Cart.findOne({ _id: cartId, user: userId });
 
   if (!cart) {
     throw new ApiError(httpStatus.NOT_FOUND, "Cart not found");
@@ -37,6 +36,38 @@ export const createPaymentIntent = async (
   if (cart.items.length === 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Cart is empty");
   }
+
+  // Dynamically populate each product based on productType
+  const populatedItems = await Promise.all(
+    cart.items.map(async (item) => {
+      let populatedProduct;
+
+      switch (item.productType) {
+        case "tire":
+          populatedProduct = await Tire.findById(item.product);
+          break;
+        case "wheel":
+          populatedProduct = await Wheel.findById(item.product);
+          break;
+        case "product":
+          populatedProduct = await Product.findById(item.product);
+          break;
+        default:
+          throw new ApiError(httpStatus.BAD_REQUEST, "Invalid product type");
+      }
+
+      if (!populatedProduct) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
+      }
+
+      return {
+        ...item,
+        product: populatedProduct, // Attach the populated product
+      };
+    })
+  );
+
+  // Do not assign populatedItems to cart.items to avoid type errors
 
   // Create payment record
   const payment = await Payment.create({
@@ -247,44 +278,86 @@ const getPaypalAccessToken = async () => {
   }
 };
 
-export const verifyStripePayment = async (
-  paymentId: string,
-  paymentIntentId: string
-) => {
+// const verifyStripePayment = async (
+//   paymentId: string,
+//   paymentIntentId: string
+// ) => {
+//   try {
+//     const payment = await Payment.findById(paymentId);
+//     if (!payment) {
+//       throw new ApiError(httpStatus.NOT_FOUND, "Payment not found");
+//     }
+
+//     if (payment.paymentStatus !== "pending") {
+//       throw new ApiError(httpStatus.BAD_REQUEST, "Payment already processed");
+//     }
+
+//     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+//     if (paymentIntent.status === "succeeded") {
+//       await Payment.findByIdAndUpdate(paymentId, {
+//         paymentStatus: "completed",
+//         paymentDetails: paymentIntent,
+//       });
+
+//       // Here you would typically create an order and clear the cart
+//       await handleSuccessfulPayment(payment);
+
+//       return { success: true, payment };
+//     } else {
+//       await Payment.findByIdAndUpdate(paymentId, {
+//         paymentStatus: "failed",
+//         paymentDetails: paymentIntent,
+//       });
+//       return { success: false, payment };
+//     }
+//   } catch (error) {
+//     throw new ApiError(
+//       httpStatus.INTERNAL_SERVER_ERROR,
+//       `Payment verification failed: ${error instanceof Error ? error.message : "Unknown error"}`
+//     );
+//   }
+// };
+
+const verifyStripePayment = async (paymentId: string, sessionId: string) => {
   try {
-    const payment = await Payment.findById(paymentId);
-    if (!payment) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Payment not found");
+    // Retrieve the checkout session using the session ID
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    // The Payment Intent ID is part of the session object
+    const paymentIntentId = session.payment_intent;
+
+    if (!paymentIntentId) {
+      throw new Error("Payment Intent ID not found in the session.");
     }
 
-    if (payment.paymentStatus !== "pending") {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Payment already processed");
-    }
-
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    // Now you can use the paymentIntentId to verify the payment
+    const paymentIntent = await stripe.paymentIntents.retrieve(
+      typeof paymentIntentId === "string" ? paymentIntentId : paymentIntentId.id
+    );
 
     if (paymentIntent.status === "succeeded") {
+      // Update payment status in your database
       await Payment.findByIdAndUpdate(paymentId, {
         paymentStatus: "completed",
         paymentDetails: paymentIntent,
       });
 
-      // Here you would typically create an order and clear the cart
-      await handleSuccessfulPayment(payment);
-
-      return { success: true, payment };
+      return { success: true, paymentIntent };
     } else {
+      // Payment failed
+      console.log("Payment failed:", paymentIntent);
+      // Update payment status in your database
       await Payment.findByIdAndUpdate(paymentId, {
         paymentStatus: "failed",
         paymentDetails: paymentIntent,
       });
-      return { success: false, payment };
+
+      return { success: false, paymentIntent };
     }
   } catch (error) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      `Payment verification failed: ${error instanceof Error ? error.message : "Unknown error"}`
-    );
+    console.error("Stripe payment verification failed:", error);
+    throw new Error("Payment verification failed");
   }
 };
 

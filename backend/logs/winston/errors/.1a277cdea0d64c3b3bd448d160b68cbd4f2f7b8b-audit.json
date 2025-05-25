@@ -94,6 +94,16 @@
             "date": 1748131368455,
             "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\errors\\tyredash-2025-25-05-06-error.log",
             "hash": "3d1b7c04f1dd35732d523ec1ccaf9b2203a76edffaaa1f70d95cac0e99183d8c"
+        },
+        {
+            "date": 1748163594505,
+            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\errors\\tyredash-2025-25-05-14-error.log",
+            "hash": "e15dabf9be0634258ede897b224bcac435028fb4c4370ff0fd3f46f0baee8be5"
+        },
+        {
+            "date": 1748164122018,
+            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\errors\\tyredash-2025-25-05-15-error.log",
+            "hash": "daf6d4761b8814b90c7460f51902f98cb0cba7286f9cc37ce394074a6f0480e0"
         }
     ],
     "hashType": "sha256"

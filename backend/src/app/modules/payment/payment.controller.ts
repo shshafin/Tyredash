@@ -24,16 +24,13 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const verifyStripePayment = catchAsync(async (req: Request, res: Response) => {
-  const { paymentId, paymentIntentId } = req.body;
+  const { paymentId, sessionId } = req.body;
   const userId = req.user?.userId;
 
   // Verify the payment belongs to the user
   await PaymentService.getPaymentById(paymentId, userId.toString());
 
-  const result = await PaymentService.verifyStripePayment(
-    paymentId,
-    paymentIntentId
-  );
+  const result = await PaymentService.verifyStripePayment(paymentId, sessionId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
