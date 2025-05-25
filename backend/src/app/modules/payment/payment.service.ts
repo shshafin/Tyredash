@@ -16,6 +16,8 @@ const stripe = new Stripe(config.stripe.secret_key || "", {
 import { Wheel } from "../wheel/wheel.model";
 import { Product } from "../product/product.model";
 import { OrderService } from "../order/order.service";
+import { Order } from "../order/order.model";
+import { CartService } from "../cart/cart.service";
 
 const createPaymentIntent = async (
   userId: Types.ObjectId,
@@ -278,44 +280,45 @@ const getPaypalAccessToken = async () => {
   }
 };
 
-// const verifyStripePayment = async (
-//   paymentId: string,
-//   paymentIntentId: string
-// ) => {
+// const verifyStripePayment = async (paymentId: string, sessionId: string) => {
 //   try {
-//     const payment = await Payment.findById(paymentId);
-//     if (!payment) {
-//       throw new ApiError(httpStatus.NOT_FOUND, "Payment not found");
+//     // Retrieve the checkout session using the session ID
+//     const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+//     // The Payment Intent ID is part of the session object
+//     const paymentIntentId = session.payment_intent;
+
+//     if (!paymentIntentId) {
+//       throw new Error("Payment Intent ID not found in the session.");
 //     }
 
-//     if (payment.paymentStatus !== "pending") {
-//       throw new ApiError(httpStatus.BAD_REQUEST, "Payment already processed");
-//     }
-
-//     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+//     // Now you can use the paymentIntentId to verify the payment
+//     const paymentIntent = await stripe.paymentIntents.retrieve(
+//       typeof paymentIntentId === "string" ? paymentIntentId : paymentIntentId.id
+//     );
 
 //     if (paymentIntent.status === "succeeded") {
+//       // Update payment status in your database
 //       await Payment.findByIdAndUpdate(paymentId, {
 //         paymentStatus: "completed",
 //         paymentDetails: paymentIntent,
 //       });
 
-//       // Here you would typically create an order and clear the cart
-//       await handleSuccessfulPayment(payment);
-
-//       return { success: true, payment };
+//       return { success: true, paymentIntent };
 //     } else {
+//       // Payment failed
+//       console.log("Payment failed:", paymentIntent);
+//       // Update payment status in your database
 //       await Payment.findByIdAndUpdate(paymentId, {
 //         paymentStatus: "failed",
 //         paymentDetails: paymentIntent,
 //       });
-//       return { success: false, payment };
+
+//       return { success: false, paymentIntent };
 //     }
 //   } catch (error) {
-//     throw new ApiError(
-//       httpStatus.INTERNAL_SERVER_ERROR,
-//       `Payment verification failed: ${error instanceof Error ? error.message : "Unknown error"}`
-//     );
+//     console.error("Stripe payment verification failed:", error);
+//     throw new Error("Payment verification failed");
 //   }
 // };
 
@@ -337,16 +340,61 @@ const verifyStripePayment = async (paymentId: string, sessionId: string) => {
     );
 
     if (paymentIntent.status === "succeeded") {
-      // Update payment status in your database
+      // Payment was successful
+
+      // Fetch the payment record from the database
+      const payment = await Payment.findById(paymentId);
+
+      if (!payment) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Payment not found");
+      }
+
+      // Fetch the cart from the database
+      const cart = await Cart.findById(payment.cart);
+
+      if (!cart) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Cart not found");
+      }
+
+      // Remove the items from the cart
+      for (const item of cart.items) {
+        await CartService.removeItemFromCart(
+          payment.user.toString(),
+          item.product.toString(),
+          item.productType
+        );
+      }
+
+      // Create an order based on the payment and cart data
+      const order = await Order.create({
+        user: payment.user,
+        payment: payment._id,
+        items: cart.items.map((item) => ({
+          product: item.product,
+          productType: item.productType,
+          quantity: item.quantity,
+          price: item.price,
+          name: item.name,
+          thumbnail: item.thumbnail,
+        })),
+        totalPrice: cart.totalPrice,
+        totalItems: cart.totalItems,
+        shippingAddress: payment.shippingAddress,
+        billingAddress: payment.billingAddress,
+        status: "pending",
+      });
+
+      // Update payment status to 'completed' and attach order details
       await Payment.findByIdAndUpdate(paymentId, {
         paymentStatus: "completed",
         paymentDetails: paymentIntent,
       });
 
-      return { success: true, paymentIntent };
+      return { success: true, paymentIntent, order };
     } else {
       // Payment failed
       console.log("Payment failed:", paymentIntent);
+
       // Update payment status in your database
       await Payment.findByIdAndUpdate(paymentId, {
         paymentStatus: "failed",
