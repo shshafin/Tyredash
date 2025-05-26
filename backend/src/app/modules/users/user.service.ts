@@ -84,8 +84,27 @@ const getSingleUser = async (email: string): Promise<IUser | null> => {
   return result;
 };
 
+const updateUser = async (
+  id: string,
+  payload: Partial<IUser>
+): Promise<IUser | null> => {
+  const result = await User.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  }).select("-password");
+
+  return result;
+};
+
+const deleteUser = async (id: string): Promise<IUser | null> => {
+  const result = await User.findByIdAndDelete(id).select("-password");
+  return result;
+};
+
 export const UserService = {
   create,
   getUsers,
   getSingleUser,
+  updateUser,
+  deleteUser,
 };
