@@ -3,6 +3,8 @@ import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { PaymentService } from "./payment.service";
+import pick from "../../../shared/pick";
+import { paginationFields } from "../../../constants/pagination";
 
 const createPayment = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.userId;
@@ -78,9 +80,63 @@ const getPaymentDetails = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getUserPaymentHistory = catchAsync(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id; // Assuming user is authenticated and user ID is available in req.user
+    const filters = pick(req.query, [
+      "paymentStatus",
+      "paymentMethod",
+      "startDate",
+      "endDate",
+    ]);
+    const paginationOptions = pick(req.query, paginationFields);
+
+    // Fetch the user's payment history
+    const result = await PaymentService.userPaymentHistory(
+      userId,
+      filters,
+      paginationOptions
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User payment history retrieved successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
+
+const getAllPayments = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, [
+    "paymentStatus",
+    "paymentMethod",
+    "startDate",
+    "endDate",
+  ]);
+  const paginationOptions = pick(req.query, paginationFields);
+
+  // Admin access to all payments
+  const result = await PaymentService.getAllPayments(
+    filters,
+    paginationOptions
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All payments retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 export const PaymentController = {
   createPayment,
   verifyStripePayment,
   verifyPaypalPayment,
   getPaymentDetails,
+  getUserPaymentHistory,
+  getAllPayments,
 };

@@ -1,7 +1,7 @@
 import { Payment } from "./payment.model";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
-import { Types } from "mongoose";
+import { SortOrder, Types } from "mongoose";
 import { ICart } from "../cart/cart.interface";
 import { Cart } from "../cart/cart.model";
 import axios from "axios";
@@ -18,6 +18,9 @@ import { Product } from "../product/product.model";
 import { OrderService } from "../order/order.service";
 import { Order } from "../order/order.model";
 import { CartService } from "../cart/cart.service";
+import { IGenericResponse } from "../../../interfaces/common";
+import { IPaginationOptions } from "../../../interfaces/pagination";
+import { paginationHelpers } from "../../../helpers/paginationHelper";
 
 const createPaymentIntent = async (
   userId: Types.ObjectId,
@@ -494,9 +497,157 @@ export const getPaymentById = async (paymentId: string, userId: string) => {
   return payment;
 };
 
+// Define searchable fields for payments
+const paymentSearchableFields = [
+  "paymentMethod",
+  "paymentStatus",
+  "transactionId",
+];
+
+// For Admin: Fetching All Payments with Filters
+const getAllPayments = async (
+  filters: any,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<any[]>> => {
+  const { searchTerm, ...filtersData } = filters;
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const andConditions = [];
+
+  // Handle searchTerm (search across multiple fields)
+  if (searchTerm) {
+    andConditions.push({
+      $or: paymentSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  // Apply specific filters
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => {
+        // Handle ObjectId fields like user and cart
+        if (["user", "cart"].includes(field)) {
+          return { [field]: new Types.ObjectId(String(value)) };
+        }
+        // Handle numeric fields like amount
+        if (field === "amount") {
+          return { [field]: Number(value) };
+        }
+        return { [field]: value };
+      }),
+    });
+  }
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  // Fetch payments with the filter, populate, and pagination
+  const result = await Payment.find(whereConditions)
+    .populate("user")
+    .populate("cart")
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Payment.countDocuments(whereConditions);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+// For User: Fetching Payment History
+const userPaymentHistory = async (
+  userId: Types.ObjectId,
+  filters: any,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<any[]>> => {
+  const { searchTerm, ...filtersData } = filters;
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const andConditions = [];
+
+  // Handle searchTerm (search across multiple fields)
+  if (searchTerm) {
+    andConditions.push({
+      $or: paymentSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  // Apply specific filters
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => {
+        // Handle ObjectId fields like user and cart
+        if (["cart"].includes(field)) {
+          return { [field]: new Types.ObjectId(String(value)) };
+        }
+        // Handle numeric fields like amount
+        if (field === "amount") {
+          return { [field]: Number(value) };
+        }
+        return { [field]: value };
+      }),
+    });
+  }
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions = {
+    user: userId,
+    ...(andConditions.length > 0 ? { $and: andConditions } : {}),
+  };
+
+  // Fetch payments for the specific user with the filter, populate, and pagination
+  const result = await Payment.find(whereConditions)
+    .populate("user")
+    .populate("cart")
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Payment.countDocuments(whereConditions);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 export const PaymentService = {
   createPaymentIntent,
   verifyStripePayment,
   verifyPaypalPayment,
   getPaymentById,
+  getAllPayments,
+  userPaymentHistory,
 };

@@ -29,4 +29,16 @@ router.get(
   PaymentController.getPaymentDetails
 );
 
+router.get(
+  "/user/history",
+  auth(ENUM_USER_ROLE.USER),
+  PaymentController.getUserPaymentHistory
+);
+
+router.get(
+  "/admin/history",
+  auth(ENUM_USER_ROLE.ADMIN),
+  PaymentController.getAllPayments
+);
+
 export const PaymentRoutes = router;
