@@ -166,41 +166,6 @@ const createStripePayment = async (payment: any, cart: ICart) => {
   }
 };
 
-// const createStripePayment = async (payment: any, cart: ICart) => {
-//   try {
-//     // Create a Stripe payment intent
-//     const paymentIntent = await stripe.paymentIntents.create({
-//       amount: Math.round(payment.amount * 100), // Stripe uses cents
-//       currency: "usd",
-//       metadata: {
-//         paymentId: payment._id.toString(),
-//         userId: payment.user.toString(),
-//         cartId: payment.cart.toString(),
-//       },
-//     });
-
-//     // Update payment with Stripe details
-//     await Payment.findByIdAndUpdate(payment._id, {
-//       transactionId: paymentIntent.id,
-//       paymentDetails: {
-//         clientSecret: paymentIntent.client_secret,
-//       },
-//     });
-
-//     return {
-//       paymentId: payment._id,
-//       clientSecret: paymentIntent.client_secret,
-//       amount: payment.amount,
-//       currency: "usd",
-//     };
-//   } catch (error) {
-//     throw new ApiError(
-//       httpStatus.INTERNAL_SERVER_ERROR,
-//       `Stripe payment error: ${error instanceof Error ? error.message : "Unknown error"}`
-//     );
-//   }
-// };
-
 const createPaypalPayment = async (payment: any, cart: ICart) => {
   try {
     // Create PayPal order
@@ -279,48 +244,6 @@ const getPaypalAccessToken = async () => {
     );
   }
 };
-
-// const verifyStripePayment = async (paymentId: string, sessionId: string) => {
-//   try {
-//     // Retrieve the checkout session using the session ID
-//     const session = await stripe.checkout.sessions.retrieve(sessionId);
-
-//     // The Payment Intent ID is part of the session object
-//     const paymentIntentId = session.payment_intent;
-
-//     if (!paymentIntentId) {
-//       throw new Error("Payment Intent ID not found in the session.");
-//     }
-
-//     // Now you can use the paymentIntentId to verify the payment
-//     const paymentIntent = await stripe.paymentIntents.retrieve(
-//       typeof paymentIntentId === "string" ? paymentIntentId : paymentIntentId.id
-//     );
-
-//     if (paymentIntent.status === "succeeded") {
-//       // Update payment status in your database
-//       await Payment.findByIdAndUpdate(paymentId, {
-//         paymentStatus: "completed",
-//         paymentDetails: paymentIntent,
-//       });
-
-//       return { success: true, paymentIntent };
-//     } else {
-//       // Payment failed
-//       console.log("Payment failed:", paymentIntent);
-//       // Update payment status in your database
-//       await Payment.findByIdAndUpdate(paymentId, {
-//         paymentStatus: "failed",
-//         paymentDetails: paymentIntent,
-//       });
-
-//       return { success: false, paymentIntent };
-//     }
-//   } catch (error) {
-//     console.error("Stripe payment verification failed:", error);
-//     throw new Error("Payment verification failed");
-//   }
-// };
 
 const verifyStripePayment = async (paymentId: string, sessionId: string) => {
   try {
@@ -414,6 +337,7 @@ export const verifyPaypalPayment = async (
   orderId: string
 ) => {
   try {
+    // Fetch the payment from the database
     const payment = await Payment.findById(paymentId);
     if (!payment) {
       throw new ApiError(httpStatus.NOT_FOUND, "Payment not found");
@@ -423,6 +347,7 @@ export const verifyPaypalPayment = async (
       throw new ApiError(httpStatus.BAD_REQUEST, "Payment already processed");
     }
 
+    // Get PayPal access token and verify payment
     const accessToken = await getPaypalAccessToken();
     const response = await axios.get(
       `${config.paypal.base_url}/v2/checkout/orders/${orderId}`,
@@ -434,21 +359,56 @@ export const verifyPaypalPayment = async (
       }
     );
 
+    // If payment is successful
     if (response.data.status === "COMPLETED") {
+      // Update payment status to 'completed'
       await Payment.findByIdAndUpdate(paymentId, {
         paymentStatus: "completed",
         paymentDetails: response.data,
       });
 
-      // Here you would typically create an order and clear the cart
-      await handleSuccessfulPayment(payment);
+      // Fetch the cart from the database
+      const cart = await Cart.findById(payment.cart);
+      if (!cart) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Cart not found");
+      }
 
-      return { success: true, payment };
+      // Remove the items from the cart
+      for (const item of cart.items) {
+        await CartService.removeItemFromCart(
+          payment.user.toString(),
+          item.product.toString(),
+          item.productType
+        );
+      }
+
+      // Create an order based on the payment and cart data
+      const order = await Order.create({
+        user: payment.user,
+        payment: payment._id,
+        items: cart.items.map((item) => ({
+          product: item.product,
+          productType: item.productType,
+          quantity: item.quantity,
+          price: item.price,
+          name: item.name,
+          thumbnail: item.thumbnail,
+        })),
+        totalPrice: cart.totalPrice,
+        totalItems: cart.totalItems,
+        shippingAddress: payment.shippingAddress,
+        billingAddress: payment.billingAddress,
+        status: "pending", // Update as necessary
+      });
+
+      return { success: true, payment, order };
     } else {
+      // Payment failed
       await Payment.findByIdAndUpdate(paymentId, {
         paymentStatus: "failed",
         paymentDetails: response.data,
       });
+
       return { success: false, payment };
     }
   } catch (error) {
@@ -458,27 +418,6 @@ export const verifyPaypalPayment = async (
     );
   }
 };
-
-// const handleSuccessfulPayment = async (payment: any) => {
-//   // 1. Create an order record (you'll need an Order model)
-//   // 2. Update product stock quantities
-//   // 3. Clear the user's cart
-//   const cart = await Cart.findById(payment.cart);
-
-//   if (cart) {
-//     // Update stock for each item in the cart
-//     for (const item of cart.items) {
-//       await updateProductStock(item.product, item.productType, item.quantity);
-//     }
-
-//     // Clear the cart
-//     await Cart.findByIdAndUpdate(payment.cart, {
-//       items: [],
-//       totalPrice: 0,
-//       totalItems: 0,
-//     });
-//   }
-// };
 
 const handleSuccessfulPayment = async (payment: any) => {
   // 1. Update product stock quantities
