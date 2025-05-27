@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 import { IWheelWidhthModel, IWheelWidth } from "./wheel-width.interface";
 
-const MakeSchema = new Schema<IWheelWidth, IWheelWidhthModel>(
+const WheelWidthSchema = new Schema<IWheelWidth, IWheelWidhthModel>(
   {
     width: {
       type: String,
@@ -18,5 +18,5 @@ const MakeSchema = new Schema<IWheelWidth, IWheelWidhthModel>(
 
 export const WheelWidth = model<IWheelWidth, IWheelWidhthModel>(
   "WheelWidth",
-  MakeSchema
+  WheelWidthSchema
 );
