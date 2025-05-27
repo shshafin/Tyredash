@@ -7,6 +7,16 @@ import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { SortOrder, Types } from "mongoose";
 import { ITire, ITireFilters } from "./tire.interface";
 import { tireSearchableFields } from "./tire.constants";
+import fs from "fs";
+import csv from "csv-parser";
+import { Year } from "../year/year.model";
+import { Make } from "../makes/make.model";
+import { CarModel } from "../models/model.model";
+import { Trim } from "../trims/trim.model";
+import { TireSize } from "../tire-size/tire-size.model";
+import { Brand } from "../brand/brand.model";
+import { Category } from "../category/category.model";
+import { DrivingType } from "../driving-type/driving-type.model";
 
 const createTire = async (tireData: ITire): Promise<ITire> => {
   const result = await Tire.create(tireData);
@@ -144,17 +154,6 @@ const deleteTire = async (id: string): Promise<ITire | null> => {
   }
   return result;
 };
-
-import fs from "fs";
-import csv from "csv-parser";
-import { Year } from "../year/year.model";
-import { Make } from "../makes/make.model";
-import { CarModel } from "../models/model.model";
-import { Trim } from "../trims/trim.model";
-import { TireSize } from "../tire-size/tire-size.model";
-import { Brand } from "../brand/brand.model";
-import { Category } from "../category/category.model";
-import { DrivingType } from "../driving-type/driving-type.model";
 
 // const processCSVUpload = async (filePath: string): Promise<any> => {
 //   const results: any[] = [];
