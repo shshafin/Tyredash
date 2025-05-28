@@ -48,6 +48,26 @@ const TireSchema = new Schema<ITire, ITireModel>(
       ref: "Category",
       required: true,
     },
+    width: {
+      type: Schema.Types.ObjectId,
+      ref: "TireWidth",
+      required: true,
+    },
+    ratio: {
+      type: Schema.Types.ObjectId,
+      ref: "TireRatio",
+      required: true,
+    },
+    diameter: {
+      type: Schema.Types.ObjectId,
+      ref: "TireDiameter",
+      required: true,
+    },
+    vehicleType: {
+      type: Schema.Types.ObjectId,
+      ref: "VehicleType",
+      required: true,
+    },
     description: {
       type: String,
     },
@@ -91,9 +111,6 @@ const TireSchema = new Schema<ITire, ITireModel>(
     sectionWidthRange: {
       type: String,
     },
-    diameterRange: {
-      type: String,
-    },
     wheelRimDiameterRange: {
       type: String,
     },
@@ -116,10 +133,6 @@ const TireSchema = new Schema<ITire, ITireModel>(
       type: Number,
       required: true,
     },
-    aspectRatio: {
-      type: Number,
-      required: true,
-    },
     rimDiameter: {
       type: Number,
       required: true,
@@ -129,10 +142,6 @@ const TireSchema = new Schema<ITire, ITireModel>(
       required: true,
     },
     rimWidthRange: {
-      type: Number,
-      required: true,
-    },
-    width: {
       type: Number,
       required: true,
     },

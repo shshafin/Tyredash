@@ -10,12 +10,34 @@ import { ITire } from "./tire.interface";
 import { deleteFile, getFileUrl } from "../../../helpers/fileHandlers";
 import ApiError from "../../../errors/ApiError";
 import { Tire } from "./tire.model";
+import { Types } from "mongoose";
 
 const createTire = catchAsync(async (req: Request, res: Response) => {
   let { data } = req.body;
 
   if (typeof data === "string") {
     data = JSON.parse(data);
+  }
+
+  const objectIdFields = [
+    "year",
+    "make",
+    "model",
+    "trim",
+    "tireSize",
+    "drivingType",
+    "brand",
+    "category",
+    "width",
+    "ratio",
+    "diameter",
+    "vehicleType",
+  ];
+
+  for (const field of objectIdFields) {
+    if (data[field] && !Types.ObjectId.isValid(data[field])) {
+      throw new ApiError(httpStatus.BAD_REQUEST, `Invalid ${field} ID`);
+    }
   }
 
   if (req.files) {

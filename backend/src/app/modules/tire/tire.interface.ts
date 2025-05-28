@@ -10,6 +10,10 @@ export interface ITire {
   drivingType: Types.ObjectId;
   brand: Types.ObjectId;
   category: Types.ObjectId;
+  width: Types.ObjectId;
+  ratio: Types.ObjectId;
+  diameter: Types.ObjectId;
+  vehicleType: Types.ObjectId;
   description: string;
   images: string[];
   productLine: string;
@@ -24,7 +28,6 @@ export interface ITire {
   sidewallDescriptionRange: string;
   temperatureGradeRange: string;
   sectionWidthRange: string;
-  diameterRange: string;
   wheelRimDiameterRange: string;
   tractionGradeRange: string;
   treadDepthRange: string;
@@ -32,11 +35,9 @@ export interface ITire {
   overallWidthRange: string;
   treadwearGradeRange: string;
   sectionWidth: number;
-  aspectRatio: number;
   rimDiameter: number;
   overallDiameter: number;
   rimWidthRange: number;
-  width: number;
   treadDepth: number;
   loadIndex: number;
   loadRange: string;
@@ -66,11 +67,13 @@ export interface ITireFilters {
   year?: string;
   trim?: string;
   tireSize?: string;
+  width?: string;
+  ratio?: string;
+  diameter?: string;
+  vehicleType?: string;
   price?: number;
   stockQuantity?: number;
   constructionType?: string;
   sectionWidth?: number;
-  aspectRatio?: number;
-  rimDiameter?: number;
   [key: string]: any;
 }
