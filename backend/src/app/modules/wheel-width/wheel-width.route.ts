@@ -32,4 +32,4 @@ router.delete(
   WheelWidthController.deleteWheelWidth
 );
 
-export const TireWidthRoutes = router;
+export const WheelWidthRoutes = router;

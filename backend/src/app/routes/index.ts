@@ -19,7 +19,14 @@ import { WishlistRoutes } from "../modules/wishlist/wishlist.routes";
 import { PaymentRoutes } from "../modules/payment/payment.routes";
 import { UploadRoutes } from "../modules/upload-images/upload.route";
 import { OrderRoutes } from "../modules/order/order.route";
-
+import { TireWidthRoutes } from "../modules/tire-width/tire-width.route";
+import { TireDiameterRoutes } from "../modules/tire-diameter/tire-diameter.route";
+import { TireRatioRoutes } from "../modules/tire-ratio/tire-ratio.route";
+import { VehicleTypeRoutes } from "../modules/vehicle-type/vehicle-type.route";
+import { WheelWidthRoutes } from "../modules/wheel-width/wheel-width.route";
+import { WheelRatioRoutes } from "../modules/wheel-ratio/wheel-ratio.route";
+import { WheelDiameterRoutes } from "../modules/wheel-diameter/wheel-diameter.route";
+import { TireWidthTypeRoutes } from "../modules/wheel-width-type/wheel-width-type.route";
 const router = express.Router();
 
 const modulesRoutes = [
@@ -68,8 +75,40 @@ const modulesRoutes = [
     module: TireRoutes,
   },
   {
+    path: "/tire-width",
+    module: TireWidthRoutes,
+  },
+  {
+    path: "/tire-ratio",
+    module: TireRatioRoutes,
+  },
+  {
+    path: "/tire-diameter",
+    module: TireDiameterRoutes,
+  },
+  {
+    path: "/vehicle-type",
+    module: VehicleTypeRoutes,
+  },
+  {
     path: "/wheel",
     module: WheelRoutes,
+  },
+  {
+    path: "/wheel-width",
+    module: WheelWidthRoutes,
+  },
+  {
+    path: "/wheel-ratio",
+    module: WheelRatioRoutes,
+  },
+  {
+    path: "/wheel-diameter",
+    module: WheelDiameterRoutes,
+  },
+  {
+    path: "/wheel-width-type",
+    module: TireWidthTypeRoutes,
   },
   {
     path: "/brand",
