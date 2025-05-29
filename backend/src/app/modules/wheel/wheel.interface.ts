@@ -9,6 +9,11 @@ export interface IWheel {
   tireSize: Types.ObjectId;
   drivingType: Types.ObjectId;
   brand: Types.ObjectId;
+  width: Types.ObjectId;
+  ratio: Types.ObjectId;
+  diameter: Types.ObjectId;
+  vehicleType: Types.ObjectId;
+  widthType: Types.ObjectId;
   description: string;
   images: string[];
   category: Types.ObjectId;
@@ -25,9 +30,8 @@ export interface IWheel {
   wheelSize: string;
   wheelAccent: string;
   wheelPieces: string;
-  wheelWidth: string;
-  RimDiameter: number;
-  RimWidth: number;
+  rimDiameter: number;
+  rimWidth: number;
   boltPattern: string;
   offset: number;
   hubBoreSize: number;
@@ -38,7 +42,6 @@ export interface IWheel {
   warranty: string;
   constructionType: string;
   wheelType: string;
-  wheelStockQuantity: number;
   price: number;
   discountPrice: number;
   stockQuantity: number;
@@ -63,5 +66,10 @@ export interface IWheelFilters {
   materialType?: string;
   RimDiameter?: number;
   RimWidth?: number;
+  width?: string;
+  ratio?: string;
+  diameter?: string;
+  vehicleType?: string;
+  widthType?: string;
   [key: string]: any;
 }

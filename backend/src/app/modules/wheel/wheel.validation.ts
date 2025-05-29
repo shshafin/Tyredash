@@ -31,6 +31,11 @@ const createWheelZodSchema = z.object({
     category: z.string({
       required_error: "Category is required",
     }),
+    width: z.string().optional(),
+    ratio: z.string().optional(),
+    diameter: z.string().optional(),
+    vehicleType: z.string().optional(),
+    widthType: z.string().optional(),
     description: z.string().optional(),
     images: z.array(z.string()).optional(),
     productLine: z.array(z.string()).optional(),
@@ -46,11 +51,10 @@ const createWheelZodSchema = z.object({
     wheelSize: z.string().optional(),
     wheelAccent: z.string().optional(),
     wheelPieces: z.string().optional(),
-    wheelWidth: z.string().optional(),
-    RimDiameter: z.number({
+    rimDiameter: z.number({
       required_error: "Rim diameter is required",
     }),
-    RimWidth: z.number({
+    rimWidth: z.number({
       required_error: "Rim width is required",
     }),
     boltPattern: z.string({
@@ -104,6 +108,11 @@ const updateWheelZodSchema = z.object({
     tireSize: z.string().optional(),
     brand: z.string().optional(),
     category: z.string().optional(),
+    width: z.string().optional(),
+    ratio: z.string().optional(),
+    diameter: z.string().optional(),
+    vehicleType: z.string().optional(),
+    widthType: z.string().optional(),
     description: z.string().optional(),
     images: z.array(z.string()).optional(),
     productLine: z.array(z.string()).optional(),
@@ -119,9 +128,8 @@ const updateWheelZodSchema = z.object({
     wheelSize: z.string().optional(),
     wheelAccent: z.string().optional(),
     wheelPieces: z.string().optional(),
-    wheelWidth: z.string().optional(),
-    RimDiameter: z.number().optional(),
-    RimWidth: z.number().optional(),
+    rimDiameter: z.number().optional(),
+    rimWidth: z.number().optional(),
     boltPattern: z.string().optional(),
     offset: z.number().optional(),
     hubBoreSize: z.number().optional(),

@@ -59,6 +59,11 @@ const getAllWheels = async (
             "drivingType",
             "brand",
             "category",
+            "width",
+            "ratio",
+            "diameter",
+            "vehicleType",
+            "widthType",
           ].includes(field)
         ) {
           if (!Types.ObjectId.isValid(String(value))) {
@@ -70,8 +75,8 @@ const getAllWheels = async (
         if (
           field === "price" ||
           field === "stockQuantity" ||
-          field === "RimDiameter" ||
-          field === "RimWidth" ||
+          field === "rimDiameter" ||
+          field === "rimWidth" ||
           field === "offset" ||
           field === "hubBoreSize" ||
           field === "numberOFBolts" ||
@@ -104,6 +109,11 @@ const getAllWheels = async (
     .populate("drivingType")
     .populate("brand")
     .populate("category")
+    .populate("width")
+    .populate("ratio")
+    .populate("diameter")
+    .populate("vehicleType")
+    .populate("widthType")
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
@@ -121,7 +131,7 @@ const getAllWheels = async (
 };
 const getSingleWheel = async (id: string): Promise<IWheel | null> => {
   const result = await Wheel.findById(id).populate(
-    "year make model trim tireSize brand category drivingType"
+    "year make model trim tireSize brand category drivingType width ratio diameter vehicleType widthType"
   );
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "Wheel not found");
@@ -148,6 +158,11 @@ const updateWheel = async (
     { path: "tireSize", select: "size" },
     { path: "drivingType", select: "title" },
     { path: "brand", select: "name" },
+    { path: "width", select: "width" },
+    { path: "ratio", select: "ratio" },
+    { path: "diameter", select: "diameter" },
+    { path: "vehicleType", select: "vehicleType" },
+    { path: "widthType", select: "widthType" },
   ]);
   return result;
 };

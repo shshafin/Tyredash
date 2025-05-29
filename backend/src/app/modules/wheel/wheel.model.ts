@@ -43,17 +43,37 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
       ref: "Brand",
       required: true,
     },
+    width: {
+      type: Schema.Types.ObjectId,
+      ref: "WheelWidth",
+    },
+    ratio: {
+      type: Schema.Types.ObjectId,
+      ref: "WheelRatio",
+    },
+    diameter: {
+      type: Schema.Types.ObjectId,
+      ref: "WheelDiameter",
+    },
+    vehicleType: {
+      type: Schema.Types.ObjectId,
+      ref: "VehicleType",
+    },
+    widthType: {
+      type: Schema.Types.ObjectId,
+      ref: "WheelWidthType",
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
     description: {
       type: String,
     },
     images: {
       type: [String],
       default: [],
-    },
-    category: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
     },
     productLine: {
       type: [String],
@@ -95,14 +115,11 @@ const WheelSchema = new Schema<IWheel, IWheelModel>(
     wheelPieces: {
       type: String,
     },
-    wheelWidth: {
-      type: String,
-    },
-    RimDiameter: {
+    rimDiameter: {
       type: Number,
       required: true,
     },
-    RimWidth: {
+    rimWidth: {
       type: Number,
       required: true,
     },
