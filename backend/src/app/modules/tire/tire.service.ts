@@ -17,6 +17,10 @@ import { TireSize } from "../tire-size/tire-size.model";
 import { Brand } from "../brand/brand.model";
 import { Category } from "../category/category.model";
 import { DrivingType } from "../driving-type/driving-type.model";
+import { TireWidth } from "../tire-width/tire-width.model";
+import { TireRatio } from "../tire-ratio/tire-ratio.model";
+import { TireDiameter } from "../tire-diameter/tire-diameter.model";
+import { VehicleType } from "../vehicle-type/vehicle-type.model";
 
 const createTire = async (tireData: ITire): Promise<ITire> => {
   const result = await Tire.create(tireData);
@@ -215,7 +219,13 @@ const uploadCSVTires = async (filePath: string): Promise<any> => {
       );
 
       const tireSize = await TireSize.findOneAndUpdate(
-        { tireSize: row.tireSize, trim: trim._id },
+        {
+          tireSize: row.tireSize,
+          model: model._id,
+          make: make._id,
+          year: year._id,
+          trim: trim._id,
+        },
         {
           $setOnInsert: {
             tireSize: row.tireSize,
@@ -269,6 +279,30 @@ const uploadCSVTires = async (filePath: string): Promise<any> => {
         { upsert: true, new: true }
       );
 
+      const width = await TireWidth.findOneAndUpdate(
+        { width: row.width },
+        { $setOnInsert: { width: row.width } },
+        { upsert: true, new: true }
+      );
+
+      const ratio = await TireRatio.findOneAndUpdate(
+        { ratio: row.ratio },
+        { $setOnInsert: { ratio: row.ratio } },
+        { upsert: true, new: true }
+      );
+
+      const diameter = await TireDiameter.findOneAndUpdate(
+        { diameter: row.diameter },
+        { $setOnInsert: { diameter: row.diameter } },
+        { upsert: true, new: true }
+      );
+
+      const vehicleType = await VehicleType.findOneAndUpdate(
+        { vehicleType: row.vehicleType },
+        { $setOnInsert: { vehicleType: row.vehicleType } },
+        { upsert: true, new: true }
+      );
+
       await Tire.findOneAndUpdate(
         {
           year: year._id,
@@ -289,6 +323,10 @@ const uploadCSVTires = async (filePath: string): Promise<any> => {
             drivingType: drivingType?._id,
             brand: brand._id,
             category: category._id,
+            width: width._id,
+            ratio: ratio._id,
+            diameter: diameter._id,
+            vehicleType: vehicleType._id,
             description: row.description || "",
             images: row.images ? row.images.split(",") : [],
             productLine: row.productLine || "",
@@ -303,7 +341,6 @@ const uploadCSVTires = async (filePath: string): Promise<any> => {
             sidewallDescriptionRange: row.sidewallDescriptionRange || "",
             temperatureGradeRange: row.temperatureGradeRange || "",
             sectionWidthRange: row.sectionWidthRange || "",
-            diameterRange: row.diameterRange || "",
             wheelRimDiameterRange: row.wheelRimDiameterRange || "",
             tractionGradeRange: row.tractionGradeRange || "",
             treadDepthRange: row.treadDepthRange || "",
@@ -311,11 +348,9 @@ const uploadCSVTires = async (filePath: string): Promise<any> => {
             overallWidthRange: row.overallWidthRange || "",
             treadwearGradeRange: row.treadwearGradeRange || "",
             sectionWidth: parseNumber(row.sectionWidth),
-            aspectRatio: parseNumber(row.aspectRatio),
             rimDiameter: parseNumber(row.rimDiameter),
             overallDiameter: parseNumber(row.overallDiameter),
             rimWidthRange: parseNumber(row.rimWidthRange),
-            width: parseNumber(row.width),
             treadDepth: parseNumber(row.treadDepth),
             loadIndex: parseNumber(row.loadIndex),
             loadRange: row.loadRange || "",
