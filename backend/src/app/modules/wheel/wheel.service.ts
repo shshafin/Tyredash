@@ -538,6 +538,7 @@ const uploadWheelCSV = async (filePath: string): Promise<any> => {
       // Now create or update the Wheel data
       await Wheel.findOneAndUpdate(
         {
+          name: row.name,
           year: year._id,
           make: make._id,
           model: model._id,

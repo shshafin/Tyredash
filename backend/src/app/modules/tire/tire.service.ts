@@ -305,6 +305,7 @@ const uploadCSVTires = async (filePath: string): Promise<any> => {
 
       await Tire.findOneAndUpdate(
         {
+          name: row.name,
           year: year._id,
           make: make._id,
           model: model._id,
