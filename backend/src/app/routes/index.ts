@@ -27,6 +27,7 @@ import { WheelWidthRoutes } from "../modules/wheel-width/wheel-width.route";
 import { WheelRatioRoutes } from "../modules/wheel-ratio/wheel-ratio.route";
 import { WheelDiameterRoutes } from "../modules/wheel-diameter/wheel-diameter.route";
 import { TireWidthTypeRoutes } from "../modules/wheel-width-type/wheel-width-type.route";
+import { AppointmentRoutes } from "../modules/appointment/appointment.route";
 const router = express.Router();
 
 const modulesRoutes = [
@@ -137,6 +138,10 @@ const modulesRoutes = [
   {
     path: "/upload",
     module: UploadRoutes,
+  },
+  {
+    path: "/appointments",
+    module: AppointmentRoutes,
   },
 ];
 
