@@ -1,5 +1,6 @@
 import express from "express";
 import { DealController } from "./deal.controller";
+import { uploadImage } from "../../../helpers/fileHandlers";
 
 const router = express.Router();
 
@@ -34,6 +35,6 @@ router.post(
 );
 
 // Route to create a new deal
-router.post("/create", DealController.createDeal);
+router.post("/create", uploadImage, DealController.createDeal);
 
 export default router;

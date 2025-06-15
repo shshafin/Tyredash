@@ -5,6 +5,7 @@ const DealSchema = new Schema<IDeal>(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
+    image: { type: String, required: true },
     discountPercentage: { type: Number, required: true },
     applicableProducts: {
       type: [String],

@@ -3,6 +3,9 @@ import { DealService } from "./deal.service";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
+import { Deal } from "./deal.model";
+import { deleteFile, getFileUrl } from "../../../helpers/fileHandlers";
+import ApiError from "../../../errors/ApiError";
 
 // Get discounted tires by brand
 const getDiscountedTiresByBrand = catchAsync(
@@ -96,7 +99,22 @@ const applyDealToProduct = catchAsync(async (req: Request, res: Response) => {
 
 // Create a new deal
 const createDeal = catchAsync(async (req: Request, res: Response) => {
-  const dealData = req.body;
+  const { ...dealData } = req.body;
+
+  const existingDeals = await Deal.findOne({
+    title: dealData.title,
+  });
+
+  if (existingDeals) {
+    if (req.file) {
+      deleteFile(req.file.filename);
+    }
+    throw new ApiError(httpStatus.BAD_REQUEST, "Category already exists");
+  }
+
+  if (req.file) {
+    dealData.image = getFileUrl(req.file.filename);
+  }
 
   const result = await DealService.createDeal(dealData);
 
