@@ -1,15 +1,24 @@
 export const UserSearchableFields = [
-  "teacherId",
-  "adminId",
-  "studentId",
-  "role",
-  "id",
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+  "addressLine1",
+  "addressLine2",
+  "city",
+  "state",
+  "zipCode",
 ];
 
 export const UserFilterableFields = [
-  "teacherId",
-  "adminId",
-  "studentId",
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+  "addressLine1",
+  "addressLine2",
+  "city",
+  "state",
+  "zipCode",
   "role",
-  "id",
 ];
