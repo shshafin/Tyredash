@@ -1,6 +1,8 @@
 import express from "express";
 import { DealController } from "./deal.controller";
 import { uploadImage } from "../../../helpers/fileHandlers";
+import auth from "../../middlewares/auth";
+import { ENUM_USER_ROLE } from "../../../enum/user";
 
 const router = express.Router();
 
@@ -35,6 +37,26 @@ router.post(
 );
 
 // Route to create a new deal
-router.post("/create", uploadImage, DealController.createDeal);
+router.post(
+  "/create",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  uploadImage,
+  DealController.createDeal
+);
 
-export default router;
+router.get("/", DealController.getAllDeals);
+
+router.patch(
+  "/:id",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  uploadImage,
+  DealController.updateDeal
+);
+
+router.delete(
+  "/:id",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DealController.deleteDeal
+);
+
+export const DealRoutes = router;

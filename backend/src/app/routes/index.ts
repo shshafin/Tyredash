@@ -28,6 +28,7 @@ import { WheelRatioRoutes } from "../modules/wheel-ratio/wheel-ratio.route";
 import { WheelDiameterRoutes } from "../modules/wheel-diameter/wheel-diameter.route";
 import { TireWidthTypeRoutes } from "../modules/wheel-width-type/wheel-width-type.route";
 import { AppointmentRoutes } from "../modules/appointment/appointment.route";
+import { DealRoutes } from "../modules/deals/deal.route";
 const router = express.Router();
 
 const modulesRoutes = [
@@ -142,6 +143,10 @@ const modulesRoutes = [
   {
     path: "/appointments",
     module: AppointmentRoutes,
+  },
+  {
+    path: "/deals",
+    module: DealRoutes,
   },
 ];
 

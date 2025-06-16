@@ -6,6 +6,10 @@ import httpStatus from "http-status";
 import { Deal } from "./deal.model";
 import { deleteFile, getFileUrl } from "../../../helpers/fileHandlers";
 import ApiError from "../../../errors/ApiError";
+import { IDeal } from "./deal.interface";
+import pick from "../../../shared/pick";
+import { dealFilterableFields } from "./deals.constant";
+import { paginationFields } from "../../../constants/pagination";
 
 // Get discounted tires by brand
 const getDiscountedTiresByBrand = catchAsync(
@@ -109,7 +113,7 @@ const createDeal = catchAsync(async (req: Request, res: Response) => {
     if (req.file) {
       deleteFile(req.file.filename);
     }
-    throw new ApiError(httpStatus.BAD_REQUEST, "Category already exists");
+    throw new ApiError(httpStatus.BAD_REQUEST, "Deals already exists");
   }
 
   if (req.file) {
@@ -126,6 +130,71 @@ const createDeal = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllDeals = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, dealFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+
+  const result = await DealService.getAllDeals(filters, paginationOptions);
+
+  sendResponse<IDeal[]>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Deals retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
+const updateDeal = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { ...payload } = req.body;
+
+  const existingDeal = await Deal.findById(id);
+  if (!existingDeal) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Deal not found!");
+  }
+
+  if (req.file) {
+    if (existingDeal.image) {
+      const oldFilename = existingDeal.image.split("/").pop();
+      deleteFile(oldFilename ?? "");
+    }
+    payload.image = getFileUrl(req.file.filename);
+  }
+
+  const result = await DealService.updateDeal(id, payload);
+
+  sendResponse<IDeal>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Deal updated successfully",
+    data: result,
+  });
+});
+
+const deleteDeal = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const deal = await Deal.findById(id);
+  if (!deal) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Deal not found");
+  }
+
+  if (deal.image) {
+    const filename = deal.image.split("/").pop();
+    deleteFile(filename ?? "");
+  }
+
+  const result = await DealService.deleteDeal(id);
+
+  sendResponse<IDeal>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Deal deleted successfully",
+    data: result,
+  });
+});
+
 export const DealController = {
   createDeal,
   getDiscountedTiresByBrand,
@@ -134,4 +203,7 @@ export const DealController = {
   applyDealToTire,
   applyDealToWheel,
   applyDealToProduct,
+  getAllDeals,
+  updateDeal,
+  deleteDeal,
 };

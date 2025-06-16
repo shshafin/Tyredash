@@ -4,6 +4,12 @@ import { Tire } from "../tire/tire.model";
 import { Wheel } from "../wheel/wheel.model";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
+import { SortOrder, Types } from "mongoose";
+import { IDeal, IDealFilters } from "./deal.interface";
+import { IGenericResponse } from "../../../interfaces/common";
+import { IPaginationOptions } from "../../../interfaces/pagination";
+import { paginationHelpers } from "../../../helpers/paginationHelper";
+import { dealSearchableFields } from "./deals.constant";
 
 // Create a new deal
 const createDeal = async (dealData: any): Promise<any> => {
@@ -159,6 +165,102 @@ const applyDiscountToProduct = async (productId: string): Promise<any> => {
   return product;
 };
 
+const getAllDeals = async (
+  filters: IDealFilters,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<IDeal[]>> => {
+  const { searchTerm, ...filtersData } = filters;
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      $or: dealSearchableFields.map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => {
+        // Handle ObjectId fields
+        if (field === "brand") {
+          return { [field]: new Types.ObjectId(String(value)) };
+        }
+        // Handle numeric fields
+        if (field === "discountPercentage") {
+          return { [field]: Number(value) };
+        }
+        // Handle date fields
+        if (field === "validFrom" || field === "validTo") {
+          return { [field]: new Date(String(value)) };
+        }
+        // Handle array fields
+        if (field === "applicableProducts") {
+          return { [field]: { $in: [value] } };
+        }
+        // Handle other fields
+        return { [field]: value };
+      }),
+    });
+  }
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await Deal.find(whereConditions)
+    .populate("brand")
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Deal.countDocuments(whereConditions);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+const updateDeal = async (
+  id: string,
+  payload: Partial<IDeal>
+): Promise<IDeal | null> => {
+  const isExist = await Deal.findById(id);
+  if (!isExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Deal not found");
+  }
+
+  const result = await Deal.findOneAndUpdate({ _id: id }, payload, {
+    new: true,
+  }).populate("brand");
+
+  return result;
+};
+
+const deleteDeal = async (id: string): Promise<IDeal | null> => {
+  const result = await Deal.findByIdAndDelete(id);
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Deal not found");
+  }
+  return result;
+};
+
 export const DealService = {
   createDeal,
   getDealsForBrand,
@@ -168,4 +270,7 @@ export const DealService = {
   applyDiscountToTire,
   applyDiscountToWheel,
   applyDiscountToProduct,
+  getAllDeals,
+  updateDeal,
+  deleteDeal,
 };

@@ -97,7 +97,7 @@ const deleteCategory = catchAsync(async (req: Request, res: Response) => {
 
   const category = await CategoryService.getSingleCategory(id);
   if (!category) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Make not found");
+    throw new ApiError(httpStatus.NOT_FOUND, "Category not found");
   }
 
   if (category.image) {

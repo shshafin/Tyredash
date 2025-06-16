@@ -6,134 +6,19 @@
     "auditLog": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\.10efcbf19438740864652396ec05f6bb33812d3a-audit.json",
     "files": [
         {
-            "date": 1747574043663,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-18-05-19-success.log",
-            "hash": "290cf362dbe25a056e2bc884a1fad01ecea79b1dec8ea4561e5b1925a228991c"
+            "date": 1749981749849,
+            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-15-06-16-success.log",
+            "hash": "dcb43732de3194cbe79f270cfc8d22f6185f53a328a99c47d09a3026017461b2"
         },
         {
-            "date": 1747585082439,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-18-05-22-success.log",
-            "hash": "5816c2f794ee794f912da19a86bf436ffea07f88c1973e49812347249e9fc759"
+            "date": 1750066359483,
+            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-16-06-15-success.log",
+            "hash": "e9ff16910d36ce1732aabf7ea34da1bad7b8d44b6126c81f9111b2a8fa50acb0"
         },
         {
-            "date": 1747613348506,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-19-05-06-success.log",
-            "hash": "7cc1ad90d55ebdd4f96496b0b1c13194c531eb989f69d19589114ed1f2702c2f"
-        },
-        {
-            "date": 1747618441290,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-19-05-07-success.log",
-            "hash": "92e24183a5613da5c323fe1159b6bc67b4552da5c3bae1c182a8f398dcde093b"
-        },
-        {
-            "date": 1747706327362,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-20-05-07-success.log",
-            "hash": "b3f9e0f5600c51dad7f6511e1482f5bd88af24913c3ef6d633822afc51aabc01"
-        },
-        {
-            "date": 1747706905093,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-20-05-08-success.log",
-            "hash": "f93c7801d94fb1f64c22adbe7b887e628c6426de0208c0d00648f7c674a48b85"
-        },
-        {
-            "date": 1747711931071,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-20-05-09-success.log",
-            "hash": "4bf0baca24e27d73af7e927cf87e3134c2489284dd69df13f83f90e6a3efc6a1"
-        },
-        {
-            "date": 1747714463935,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-20-05-10-success.log",
-            "hash": "e1dd01270fbf148f4db1ee624c94e53d6ed91e8a0f5701df849e05ea47045e01"
-        },
-        {
-            "date": 1747732370670,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-20-05-15-success.log",
-            "hash": "5db1bb0223721b0f8abb584035591bf7f8b5d6be7cf4f32b868da7e4db8d532d"
-        },
-        {
-            "date": 1747735210053,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-20-05-16-success.log",
-            "hash": "f17d96e84180c05c70a589ef913e4fbbac176ea252c1a64b2138b90ae984c1b3"
-        },
-        {
-            "date": 1747796910620,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-21-05-09-success.log",
-            "hash": "96b153289cd3e95c2b93b431cdcdbdb883d5647681dc715a52fd7e4e7d59ae60"
-        },
-        {
-            "date": 1747817973888,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-21-05-14-success.log",
-            "hash": "8a96ef13266f1d62ec5a47f4db1a65f1816388ba53e1aac169996b7a9c1fd6da"
-        },
-        {
-            "date": 1747818193476,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-21-05-15-success.log",
-            "hash": "8fac19f5f36eedb5c531cd507a743c4e24eface3a33fd6d385f38fd3395ce38f"
-        },
-        {
-            "date": 1747822091605,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-21-05-16-success.log",
-            "hash": "f42efcaa300c3d1a757d2be8bfc499dd070f0db1ce22af7675b79d39458029ce"
-        },
-        {
-            "date": 1747832978427,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-21-05-19-success.log",
-            "hash": "8dea8c6189dee2c79d83cddca7ca63c8128e8ad659c33cde19ce4bd242a02cec"
-        },
-        {
-            "date": 1747884834181,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-22-05-09-success.log",
-            "hash": "3a7af48edfbfd994ab52dddeffbf57f27e402d1501dbc3c7e8aeb7d21f56e4a5"
-        },
-        {
-            "date": 1748131368447,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-25-05-06-success.log",
-            "hash": "3a4bd9692e2ac9995ea46465dab4a6c9906abfabf0d19e2771de7a8a233dcab7"
-        },
-        {
-            "date": 1748163594490,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-25-05-14-success.log",
-            "hash": "73bd5369f4405142ed6ae16c14975383251eb4b452a3cf4fbdce281b33c23347"
-        },
-        {
-            "date": 1748164122009,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-25-05-15-success.log",
-            "hash": "9b5d232735d3ab10fc2ec0da352179336ae69fba06572cfc6f1272b3addeec7b"
-        },
-        {
-            "date": 1748192541724,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-25-05-23-success.log",
-            "hash": "2119ba9ce392e070b86fa38103a8ba281355224c3e2eda31c46bea6e1105070f"
-        },
-        {
-            "date": 1748475165880,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-29-05-05-success.log",
-            "hash": "5e6f1d55a3f5bab5cb4c96d0c241011ed1908484a250acbf3bf1db1fe151eac6"
-        },
-        {
-            "date": 1748522813726,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-29-05-18-success.log",
-            "hash": "0aea70f7d98f7448c4541cef021cba4eec17b4f84124f977c8fd6ee0b05fd46f"
-        },
-        {
-            "date": 1748525342829,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-29-05-19-success.log",
-            "hash": "dbb223b285a251e183db4e46e84cd862e0c0dd10aec3d2b5a2ca7d8d67e7c1a8"
-        },
-        {
-            "date": 1748599875283,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-30-05-16-success.log",
-            "hash": "a97ad12b7a6b99edad8e3214aa673ec0a6bece3dfdba0e4ac0f3d2cf4aaf3ede"
-        },
-        {
-            "date": 1748663572362,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-31-05-09-success.log",
-            "hash": "8d252b1bff728eebfc161d9ba5010f98f42f0ce9b904e8e62f3e67273cc2f93f"
-        },
-        {
-            "date": 1748664138295,
-            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-31-05-10-success.log",
-            "hash": "b4813d49c892ebf6de8971433fb4a5cee401e2b8918d54b2c4fc8de2b3939eb2"
+            "date": 1750073973237,
+            "name": "C:\\projects\\Tyredash\\backend\\logs\\winston\\successes\\tyredash-2025-16-06-17-success.log",
+            "hash": "5a327724546d02cbd566037d0dd4b4740baf261e1a225610022f390f3e28c5ef"
         }
     ],
     "hashType": "sha256"
