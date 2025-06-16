@@ -43,7 +43,7 @@ router.post(
   uploadImage,
   DealController.createDeal
 );
-
+router.get("/:id", DealController.getSingleDeal);
 router.get("/", DealController.getAllDeals);
 
 router.patch(

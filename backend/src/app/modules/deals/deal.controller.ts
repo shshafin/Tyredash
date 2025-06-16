@@ -130,6 +130,18 @@ const createDeal = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSingleDeal = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await DealService.getSingleDeal(id);
+
+  sendResponse<IDeal>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Single Deal fetched successfully",
+    data: result,
+  });
+});
+
 const getAllDeals = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, dealFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
@@ -203,6 +215,7 @@ export const DealController = {
   applyDealToTire,
   applyDealToWheel,
   applyDealToProduct,
+  getSingleDeal,
   getAllDeals,
   updateDeal,
   deleteDeal,

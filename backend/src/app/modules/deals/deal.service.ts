@@ -165,6 +165,12 @@ const applyDiscountToProduct = async (productId: string): Promise<any> => {
   return product;
 };
 
+const getSingleDeal = async (id: string): Promise<IDeal | null> => {
+  const result = await Deal.findById(id).populate("brand");
+
+  return result;
+};
+
 const getAllDeals = async (
   filters: IDealFilters,
   paginationOptions: IPaginationOptions
@@ -270,6 +276,7 @@ export const DealService = {
   applyDiscountToTire,
   applyDiscountToWheel,
   applyDiscountToProduct,
+  getSingleDeal,
   getAllDeals,
   updateDeal,
   deleteDeal,
