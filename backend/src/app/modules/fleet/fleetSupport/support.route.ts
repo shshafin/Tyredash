@@ -43,4 +43,30 @@ router.delete(
   FleetSupportController.deleteFleetSupport
 );
 
+// Add these to your existing router
+router.get(
+  "/user/:userId",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
+  FleetSupportController.getSupportsByUser
+);
+
+router.patch(
+  "/:id/status",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  FleetSupportController.updateStatus
+);
+
+router.post(
+  "/:id/response",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
+  uploadFiles,
+  FleetSupportController.addResponse
+);
+
+router.get(
+  "/statistics",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  FleetSupportController.getStatistics
+);
+
 export const FleetSupportRoutes = router;

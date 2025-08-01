@@ -146,10 +146,86 @@ const deleteFleetSupport = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get support requests by user ID
+const getSupportsByUser = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const paginationOptions = pick(req.query, paginationFields);
+
+  const result = await FleetSupportService.getFleetSupportsByUser(
+    userId,
+    paginationOptions
+  );
+
+  sendResponse<IFleetSupport[]>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User's fleet support requests retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
+// Update support request status
+const updateStatus = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const result = await FleetSupportService.updateSupportStatus(id, status);
+
+  sendResponse<IFleetSupport>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Support request status updated successfully",
+    data: result,
+  });
+});
+
+// Add response to support ticket
+const addResponse = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  let { userId, message } = req.body;
+  let files: string[] = [];
+
+  if (req.files) {
+    files = (req.files as Express.Multer.File[]).map((file) =>
+      getFileUrl(file.filename)
+    );
+  }
+
+  const result = await FleetSupportService.addResponseToSupport(id, {
+    userId,
+    message,
+    files,
+  });
+
+  sendResponse<IFleetSupport>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Response added to support request successfully",
+    data: result,
+  });
+});
+
+// Get support statistics
+const getStatistics = catchAsync(async (req: Request, res: Response) => {
+  const result = await FleetSupportService.getSupportStatistics();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Support statistics retrieved successfully",
+    data: result,
+  });
+});
+
 export const FleetSupportController = {
   createFleetSupport,
   getAllFleetSupports,
   getSingleFleetSupport,
   updateFleetSupport,
   deleteFleetSupport,
+  getSupportsByUser,
+  updateStatus,
+  addResponse,
+  getStatistics,
 };

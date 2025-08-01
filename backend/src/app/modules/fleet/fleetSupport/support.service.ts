@@ -118,10 +118,105 @@ const deleteFleetSupport = async (
   return result;
 };
 
+// Get support requests by user ID
+const getFleetSupportsByUser = async (
+  userId: string,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<IFleetSupport[]>> => {
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const result = await FleetSupport.find({ user: userId })
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit);
+
+  const total = await FleetSupport.countDocuments({ user: userId });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+// Update support request status (e.g., Open, In Progress, Resolved)
+const updateSupportStatus = async (
+  id: string,
+  status: string
+): Promise<IFleetSupport | null> => {
+  const validStatuses = ["Open", "In Progress", "Resolved", "Closed"];
+  if (!validStatuses.includes(status)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid status value");
+  }
+
+  const result = await FleetSupport.findByIdAndUpdate(
+    id,
+    { status },
+    { new: true }
+  );
+  return result;
+};
+
+// Add response to a support ticket
+const addResponseToSupport = async (
+  id: string,
+  response: {
+    userId: string;
+    message: string;
+    files?: string[];
+  }
+): Promise<IFleetSupport | null> => {
+  const result = await FleetSupport.findByIdAndUpdate(
+    id,
+    {
+      $push: {
+        responses: {
+          user: response.userId,
+          message: response.message,
+          files: response.files || [],
+          createdAt: new Date(),
+        },
+      },
+      $set: { updatedAt: new Date() },
+    },
+    { new: true }
+  );
+  return result;
+};
+
+const getSupportStatistics = async (): Promise<{
+  open: number;
+  inProgress: number;
+  resolved: number;
+  total: number;
+}> => {
+  const [open, inProgress, resolved, total] = await Promise.all([
+    FleetSupport.countDocuments({ status: "Open" }),
+    FleetSupport.countDocuments({ status: "In Progress" }),
+    FleetSupport.countDocuments({ status: "Resolved" }),
+    FleetSupport.countDocuments(),
+  ]);
+
+  return { open, inProgress, resolved, total };
+};
+
 export const FleetSupportService = {
   createFleetSupport,
   getAllFleetSupports,
   getSingleFleetSupport,
   updateFleetSupport,
   deleteFleetSupport,
+  getFleetSupportsByUser,
+  updateSupportStatus,
+  addResponseToSupport,
+  getSupportStatistics,
 };

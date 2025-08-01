@@ -38,6 +38,24 @@ const fleetSupportSchema = new Schema<IFleetSupport, IFleetSupportModel>(
       type: [String],
       default: [],
     },
+    status: {
+      type: String,
+      enum: ["Open", "In Progress", "Resolved", "Closed"],
+      default: "Open",
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: false, // Optional, can be set later
+    },
+    responses: [
+      {
+        user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        message: { type: String, required: true },
+        files: { type: [String], default: [] },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

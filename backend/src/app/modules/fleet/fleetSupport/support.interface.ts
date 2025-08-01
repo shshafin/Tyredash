@@ -1,4 +1,11 @@
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
+
+export interface SupportResponse {
+  user: Types.ObjectId;
+  message: string;
+  files?: string[];
+  createdAt: Date;
+}
 
 export interface IFleetSupport {
   issueType:
@@ -18,6 +25,9 @@ export interface IFleetSupport {
   subject: string;
   message: string;
   files: string[];
+  status?: "Open" | "In Progress" | "Resolved" | "Closed";
+  user?: Types.ObjectId;
+  responses?: SupportResponse[];
 }
 
 export type IFleetSupportModel = Model<IFleetSupport, Record<string, unknown>>;
