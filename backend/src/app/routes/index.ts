@@ -29,6 +29,8 @@ import { WheelDiameterRoutes } from "../modules/wheel-diameter/wheel-diameter.ro
 import { TireWidthTypeRoutes } from "../modules/wheel-width-type/wheel-width-type.route";
 import { AppointmentRoutes } from "../modules/appointment/appointment.route";
 import { DealRoutes } from "../modules/deals/deal.route";
+import { FleetVehicleRoutes } from "../modules/fleet/vehicle/vehicle.route";
+import { FleetSupportRoutes } from "../modules/fleet/fleetSupport/support.route";
 const router = express.Router();
 
 const modulesRoutes = [
@@ -147,6 +149,14 @@ const modulesRoutes = [
   {
     path: "/deals",
     module: DealRoutes,
+  },
+  {
+    path: "/fleet-vehicles",
+    module: FleetVehicleRoutes,
+  },
+  {
+    path: "/fleet-supports",
+    module: FleetSupportRoutes,
   },
 ];
 
