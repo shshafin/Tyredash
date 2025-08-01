@@ -31,6 +31,7 @@ import { AppointmentRoutes } from "../modules/appointment/appointment.route";
 import { DealRoutes } from "../modules/deals/deal.route";
 import { FleetVehicleRoutes } from "../modules/fleet/vehicle/vehicle.route";
 import { FleetSupportRoutes } from "../modules/fleet/fleetSupport/support.route";
+import { FleetAppointmentRoutes } from "../modules/fleet/fleetAppointment/appointment.route";
 const router = express.Router();
 
 const modulesRoutes = [
@@ -157,6 +158,10 @@ const modulesRoutes = [
   {
     path: "/fleet-supports",
     module: FleetSupportRoutes,
+  },
+  {
+    path: "/fleet-appointments",
+    module: FleetAppointmentRoutes,
   },
 ];
 
